@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ../apache:/var/www
+      - ../apache:/var/www/html
       - ../apache/php/php.ini:/usr/local/etc/php/conf.d/app.ini
     networks:
       - laravel_network
@@ -56,7 +56,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - /tmp/postgres_data:/var/lib/postgresql/data
-      - ../apache/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../tmp:/docker-entrypoint-initdb.d
     networks:
       - laravel_network
 
