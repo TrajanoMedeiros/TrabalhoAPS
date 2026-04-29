@@ -1,9 +1,6 @@
 from google import genai
 from google.genai import types
-
-
-API_KEY = "AIzaSyBkNE_T0bmXQWL3BE-bLrm9FntVmqUAeuA"
-MODEL = "gemini-3-flash-preview"
+from config import API_KEY, MODEL
 
 
 def iniciar_chatbot() -> None:
