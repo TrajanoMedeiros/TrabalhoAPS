@@ -1,7 +1,7 @@
 docker-compose.yml
 Dockerfile
-init.sql
 public/
 .idea
+.antigravitycli
 __pycache__
 config.py

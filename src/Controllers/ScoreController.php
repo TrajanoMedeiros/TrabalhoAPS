@@ -3,26 +3,17 @@
 class ScoreController {
 
     public function getScore() {
-        $userId = AuthController::getAuthenticatedUserId();
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(["error" => "Unauthorized"]);
-            return;
-        }
+        $userId = Middleware::auth();
 
         $pdo = Database::getConnection();
 
-        // Calculate Total Income
-        $stmtIn = $pdo->prepare("SELECT SUM(valor) as total FROM incomes WHERE id_usuario = ?");
-        $stmtIn->execute([$userId]);
-        $totalIncome = $stmtIn->fetch()['total'] ?? 0;
+        
+        $totalIncome = Income::getTotal($userId);
 
-        // Calculate Total Expenses
-        $stmtOut = $pdo->prepare("SELECT SUM(valor) as total FROM expenses WHERE id_usuario = ?");
-        $stmtOut->execute([$userId]);
-        $totalExpense = $stmtOut->fetch()['total'] ?? 0;
+        
+        $totalExpense = Expense::getTotal($userId);
 
-        // Score Logic
+        // Logica do Score
         $baseScore = 500;
         $score = $baseScore;
 
@@ -30,18 +21,18 @@ class ScoreController {
             $margin = $totalIncome - $totalExpense;
             
             if ($margin > 0) {
-                // Positive behavior: Savings
+                
                 $savingsRatio = $margin / $totalIncome;
-                // Add up to 300 points if they save a lot
+                
                 $score += min(300, 300 * $savingsRatio);
             } else {
-                // Negative behavior: Debt
+                
                 $debtRatio = abs($margin) / $totalIncome;
-                // Subtract up to 400 points
+                
                 $score -= min(400, 400 * $debtRatio);
             }
 
-            // Consistency Bonus (if they have more than 5 transactions)
+            
             $stmtCount = $pdo->prepare("SELECT COUNT(*) as qtd FROM incomes WHERE id_usuario = ?");
             $stmtCount->execute([$userId]);
             $countIn = $stmtCount->fetch()['qtd'] ?? 0;
@@ -51,23 +42,46 @@ class ScoreController {
             $countOut = $stmtCountOut->fetch()['qtd'] ?? 0;
 
             if (($countIn + $countOut) >= 5) {
-                $score += 50; // Active user bonus
+                $score += 50;
+            }
+
+            // Bonus por meta
+            $goals = FinancialGoal::findAllByUser($userId);
+            if (count($goals) > 0) {
+                $score += 25; 
+                $completedGoals = 0;
+                foreach ($goals as $goal) {
+                    if ((float)$goal['valor_atual'] >= (float)$goal['valor_alvo']) {
+                        $completedGoals++;
+                    }
+                }
+                if ($completedGoals > 0) {
+                    $score += min(75, $completedGoals * 25); 
+                }
             }
 
         } else if ($totalExpense > 0) {
-            // Expenses but no income = very bad
+            
             $score -= 300;
         }
 
-        // Ensure score is between 0 and 1000
+        
         $finalScore = max(0, min(1000, round($score)));
+
+        $level = 'Crítico';
+        if ($finalScore >= 800) $level = 'Excelente';
+        else if ($finalScore >= 600) $level = 'Bom';
+        else if ($finalScore >= 400) $level = 'Regular';
+        else if ($finalScore >= 200) $level = 'Ruim';
 
         header('Content-Type: application/json');
         echo json_encode([
             "score" => $finalScore,
+            "nivel" => $level,
             "details" => [
                 "total_incomes" => (float) $totalIncome,
-                "total_expenses" => (float) $totalExpense
+                "total_expenses" => (float) $totalExpense,
+                "saldo" => (float) ($totalIncome - $totalExpense)
             ],
             "message" => "Score calculado com base no histórico do usuário."
         ]);

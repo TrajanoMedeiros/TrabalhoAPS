@@ -3,42 +3,88 @@
 class ExpenseController {
 
     public function index() {
-        $userId = AuthController::getAuthenticatedUserId();
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(["error" => "Unauthorized"]);
-            return;
-        }
+        $userId = Middleware::auth();
 
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT d.*, c.nome as categoria_nome FROM expenses d LEFT JOIN categories c ON d.id_categoria = c.id_categoria WHERE d.id_usuario = ?");
-        $stmt->execute([$userId]);
-        $expenses = $stmt->fetchAll();
+        $filters = [];
+        if (isset($_GET['mes'])) $filters['mes'] = (int) $_GET['mes'];
+        if (isset($_GET['ano'])) $filters['ano'] = (int) $_GET['ano'];
+
+        $expenses = Expense::findAllByUser($userId, $filters);
 
         header('Content-Type: application/json');
         echo json_encode($expenses);
     }
 
-    public function store() {
-        $userId = AuthController::getAuthenticatedUserId();
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(["error" => "Unauthorized"]);
+    public function show($id) {
+        $userId = Middleware::auth();
+
+        $expense = Expense::findById($id, $userId);
+        if (!$expense) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Expense not found"]);
             return;
         }
+
+        header('Content-Type: application/json');
+        echo json_encode($expense);
+    }
+
+    public function store() {
+        $userId = Middleware::auth();
 
         $data = json_decode(file_get_contents("php://input"), true);
         if (!isset($data['valor']) || !isset($data['data']) || !isset($data['id_categoria'])) {
             http_response_code(400);
-            echo json_encode(["error" => "Missing required fields"]);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Missing required fields: valor, data, id_categoria"]);
             return;
         }
 
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("INSERT INTO expenses (valor, data, descricao, id_usuario, id_categoria) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$data['valor'], $data['data'], $data['descricao'] ?? null, $userId, $data['id_categoria']]);
+        $data['id_usuario'] = $userId;
+        $expense = Expense::create($data);
 
         http_response_code(201);
-        echo json_encode(["message" => "Expense created successfully"]);
+        header('Content-Type: application/json');
+        echo json_encode(["message" => "Expense created successfully", "data" => $expense]);
+    }
+
+    public function update($id) {
+        $userId = Middleware::auth();
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (empty($data)) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "No data provided"]);
+            return;
+        }
+
+        $rowCount = Expense::update($id, $userId, $data);
+        if ($rowCount === 0) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Expense not found or not owned by user"]);
+            return;
+        }
+
+        $expense = Expense::findById($id, $userId);
+        header('Content-Type: application/json');
+        echo json_encode(["message" => "Expense updated successfully", "data" => $expense]);
+    }
+
+    public function destroy($id) {
+        $userId = Middleware::auth();
+
+        $rowCount = Expense::delete($id, $userId);
+        if ($rowCount === 0) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Expense not found or not owned by user"]);
+            return;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(["message" => "Expense deleted successfully"]);
     }
 }
