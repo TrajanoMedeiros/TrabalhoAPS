@@ -3,6 +3,7 @@ export type User = {
   nome: string
   email: string
   tipo_usuario: 'personal' | 'business'
+  papel: 'admin' | 'user'
 }
 
 export type Category = {
