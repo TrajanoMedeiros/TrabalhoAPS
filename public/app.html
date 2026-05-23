@@ -4,11 +4,352 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saldoo</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <script src="/assets/app.js" defer></script>
   </head>
   <body>
-    <main>
-      <h1>Saldoo</h1>
-      <p>Aplicacao em configuracao.</p>
-    </main>
+    <div id="app">
+      <section id="auth-view" class="auth-shell">
+        <aside class="brand-panel" aria-label="Saldoo">
+          <div class="brand-lockup">
+            <img src="/assets/saldoo-mark.svg" alt="" class="brand-mark">
+            <span>Saldoo</span>
+          </div>
+          <div class="brand-copy">
+            <h1>Financas claras para decidir melhor.</h1>
+            <p>Controle receitas, despesas, metas e score financeiro em um painel unico.</p>
+          </div>
+          <div class="brand-metrics" aria-label="Indicadores do produto">
+            <div>
+              <strong>360°</strong>
+              <span>visao financeira</span>
+            </div>
+            <div>
+              <strong>24h</strong>
+              <span>sessao segura</span>
+            </div>
+          </div>
+        </aside>
+
+        <main class="auth-panel" aria-labelledby="auth-title">
+          <div class="auth-heading">
+            <img src="/assets/saldoo-mark.svg" alt="" class="mobile-mark">
+            <div>
+              <p class="eyebrow">Bem-vindo</p>
+              <h2 id="auth-title">Acesse sua conta</h2>
+            </div>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="Autenticacao">
+            <button type="button" class="segment is-active" data-auth-mode="login" role="tab" aria-selected="true">Entrar</button>
+            <button type="button" class="segment" data-auth-mode="register" role="tab" aria-selected="false">Criar conta</button>
+          </div>
+
+          <form id="login-form" class="stacked-form">
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+              <span>Senha</span>
+              <input name="senha" type="password" autocomplete="current-password" required>
+            </label>
+            <button class="primary-action" type="submit">Entrar</button>
+          </form>
+
+          <form id="register-form" class="stacked-form" hidden>
+            <label>
+              <span>Nome</span>
+              <input name="nome" type="text" autocomplete="name" minlength="2" required>
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+              <span>Tipo</span>
+              <select name="tipo_usuario" required>
+                <option value="personal">Pessoa fisica</option>
+                <option value="business">Empresa</option>
+              </select>
+            </label>
+            <label>
+              <span>Senha</span>
+              <input name="senha" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+            <button class="primary-action" type="submit">Criar conta</button>
+          </form>
+        </main>
+      </section>
+
+      <section id="app-view" class="app-shell" hidden>
+        <header class="topbar">
+          <div class="brand-lockup compact">
+            <img src="/assets/saldoo-mark.svg" alt="" class="brand-mark">
+            <span>Saldoo</span>
+          </div>
+          <div class="topbar-actions">
+            <span id="user-pill" class="user-pill"></span>
+            <button id="logout-button" type="button" class="ghost-action">Sair</button>
+          </div>
+        </header>
+
+        <div class="workspace">
+          <nav class="sidebar" aria-label="Navegacao principal">
+            <button type="button" class="nav-item is-active" data-page="dashboard">Painel</button>
+            <button type="button" class="nav-item" data-page="transactions">Lancamentos</button>
+            <button type="button" class="nav-item" data-page="goals">Metas</button>
+            <button type="button" class="nav-item" data-page="assistant">Assistente</button>
+            <button type="button" class="nav-item" data-page="settings">Perfil</button>
+          </nav>
+
+          <main class="content">
+            <section class="page is-active" data-page-panel="dashboard" aria-labelledby="dashboard-title">
+              <div class="page-heading">
+                <div>
+                  <p class="eyebrow">Visao geral</p>
+                  <h2 id="dashboard-title">Painel financeiro</h2>
+                </div>
+                <form id="period-form" class="period-form">
+                  <label>
+                    <span>Mes</span>
+                    <select name="mes"></select>
+                  </label>
+                  <label>
+                    <span>Ano</span>
+                    <input name="ano" type="number" min="2000" max="2100">
+                  </label>
+                  <button type="submit" class="secondary-action">Filtrar</button>
+                </form>
+              </div>
+
+              <div id="summary-grid" class="summary-grid" aria-live="polite"></div>
+
+              <div class="dashboard-grid">
+                <section class="panel" aria-labelledby="history-title">
+                  <div class="panel-heading">
+                    <h3 id="history-title">Historico mensal</h3>
+                  </div>
+                  <div id="history-chart" class="history-chart"></div>
+                </section>
+
+                <section class="panel" aria-labelledby="score-title">
+                  <div class="panel-heading">
+                    <h3 id="score-title">Score financeiro</h3>
+                  </div>
+                  <div id="score-panel"></div>
+                </section>
+              </div>
+
+              <div class="dashboard-grid">
+                <section class="panel" aria-labelledby="distribution-title">
+                  <div class="panel-heading">
+                    <h3 id="distribution-title">Gastos por categoria</h3>
+                  </div>
+                  <div id="expense-distribution" class="distribution-list"></div>
+                </section>
+
+                <section class="panel" aria-labelledby="recent-title">
+                  <div class="panel-heading">
+                    <h3 id="recent-title">Movimentacoes recentes</h3>
+                  </div>
+                  <div id="recent-list" class="record-list"></div>
+                </section>
+              </div>
+            </section>
+
+            <section class="page" data-page-panel="transactions" aria-labelledby="transactions-title">
+              <div class="page-heading">
+                <div>
+                  <p class="eyebrow">Fluxo de caixa</p>
+                  <h2 id="transactions-title">Receitas e despesas</h2>
+                </div>
+              </div>
+
+              <div class="split-grid">
+                <section class="panel" aria-labelledby="transaction-form-title">
+                  <div class="panel-heading">
+                    <h3 id="transaction-form-title">Novo lancamento</h3>
+                  </div>
+                  <form id="transaction-form" class="stacked-form compact-form">
+                    <label>
+                      <span>Tipo</span>
+                      <select name="tipo" required>
+                        <option value="income">Receita</option>
+                        <option value="expense">Despesa</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Valor</span>
+                      <input name="valor" type="number" step="0.01" min="0.01" required>
+                    </label>
+                    <label>
+                      <span>Data</span>
+                      <input name="data" type="date" required>
+                    </label>
+                    <label>
+                      <span>Categoria</span>
+                      <select name="id_categoria" required></select>
+                    </label>
+                    <label>
+                      <span>Descricao</span>
+                      <input name="descricao" type="text" maxlength="500">
+                    </label>
+                    <button type="submit" class="primary-action">Salvar lancamento</button>
+                  </form>
+                </section>
+
+                <section class="panel" aria-labelledby="transaction-list-title">
+                  <div class="panel-heading">
+                    <h3 id="transaction-list-title">Lancamentos</h3>
+                  </div>
+                  <div id="transaction-list" class="record-list"></div>
+                </section>
+              </div>
+            </section>
+
+            <section class="page" data-page-panel="goals" aria-labelledby="goals-title">
+              <div class="page-heading">
+                <div>
+                  <p class="eyebrow">Planejamento</p>
+                  <h2 id="goals-title">Metas financeiras</h2>
+                </div>
+              </div>
+
+              <div class="split-grid">
+                <section class="panel" aria-labelledby="goal-form-title">
+                  <div class="panel-heading">
+                    <h3 id="goal-form-title">Nova meta</h3>
+                  </div>
+                  <form id="goal-form" class="stacked-form compact-form">
+                    <label>
+                      <span>Titulo</span>
+                      <input name="titulo" type="text" maxlength="120" required>
+                    </label>
+                    <label>
+                      <span>Valor alvo</span>
+                      <input name="valor_alvo" type="number" step="0.01" min="0.01" required>
+                    </label>
+                    <label>
+                      <span>Valor atual</span>
+                      <input name="valor_atual" type="number" step="0.01" min="0">
+                    </label>
+                    <label>
+                      <span>Data limite</span>
+                      <input name="data_limite" type="date">
+                    </label>
+                    <label>
+                      <span>Categoria</span>
+                      <select name="id_categoria"></select>
+                    </label>
+                    <button type="submit" class="primary-action">Salvar meta</button>
+                  </form>
+                </section>
+
+                <section class="panel" aria-labelledby="goal-list-title">
+                  <div class="panel-heading">
+                    <h3 id="goal-list-title">Metas ativas</h3>
+                  </div>
+                  <div id="goal-list" class="goal-list"></div>
+                </section>
+              </div>
+            </section>
+
+            <section class="page" data-page-panel="assistant" aria-labelledby="assistant-title">
+              <div class="page-heading">
+                <div>
+                  <p class="eyebrow">Orientacao</p>
+                  <h2 id="assistant-title">Assistente financeiro</h2>
+                </div>
+              </div>
+              <section class="panel assistant-panel">
+                <div id="chat-log" class="chat-log" aria-live="polite"></div>
+                <form id="chat-form" class="chat-form">
+                  <label class="sr-only" for="chat-input">Mensagem</label>
+                  <input id="chat-input" name="mensagem" type="text" minlength="3" maxlength="600" placeholder="Pergunte sobre score, dividas ou economia" required>
+                  <button type="submit" class="primary-action">Enviar</button>
+                </form>
+              </section>
+            </section>
+
+            <section class="page" data-page-panel="settings" aria-labelledby="settings-title">
+              <div class="page-heading">
+                <div>
+                  <p class="eyebrow">Conta</p>
+                  <h2 id="settings-title">Perfil e categorias</h2>
+                </div>
+              </div>
+
+              <div class="split-grid">
+                <section class="panel" aria-labelledby="profile-title">
+                  <div class="panel-heading">
+                    <h3 id="profile-title">Dados do perfil</h3>
+                  </div>
+                  <form id="profile-form" class="stacked-form compact-form">
+                    <label>
+                      <span>Nome</span>
+                      <input name="nome" type="text" minlength="2" required>
+                    </label>
+                    <label>
+                      <span>Email</span>
+                      <input name="email" type="email" required>
+                    </label>
+                    <label>
+                      <span>Tipo</span>
+                      <select name="tipo_usuario" required>
+                        <option value="personal">Pessoa fisica</option>
+                        <option value="business">Empresa</option>
+                      </select>
+                    </label>
+                    <button type="submit" class="primary-action">Atualizar perfil</button>
+                  </form>
+                </section>
+
+                <section class="panel" aria-labelledby="category-title">
+                  <div class="panel-heading">
+                    <h3 id="category-title">Categorias proprias</h3>
+                  </div>
+                  <form id="category-form" class="inline-form">
+                    <label>
+                      <span>Nome</span>
+                      <input name="nome" type="text" minlength="2" maxlength="80" required>
+                    </label>
+                    <label>
+                      <span>Tipo</span>
+                      <select name="tipo" required>
+                        <option value="expense">Despesa</option>
+                        <option value="income">Receita</option>
+                        <option value="both">Ambos</option>
+                      </select>
+                    </label>
+                    <button type="submit" class="secondary-action">Adicionar</button>
+                  </form>
+                  <div id="category-list" class="chip-list"></div>
+                </section>
+
+                <section class="panel" aria-labelledby="password-title">
+                  <div class="panel-heading">
+                    <h3 id="password-title">Seguranca</h3>
+                  </div>
+                  <form id="password-form" class="stacked-form compact-form">
+                    <label>
+                      <span>Senha atual</span>
+                      <input name="senha_atual" type="password" autocomplete="current-password" required>
+                    </label>
+                    <label>
+                      <span>Nova senha</span>
+                      <input name="nova_senha" type="password" autocomplete="new-password" minlength="8" required>
+                    </label>
+                    <button type="submit" class="primary-action">Atualizar senha</button>
+                  </form>
+                </section>
+              </div>
+            </section>
+          </main>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
   </body>
 </html>
