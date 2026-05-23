@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\GoalResource;
 use App\Models\Category;
 use App\Models\FinancialGoal;
 use App\Services\ApiResponse;
-use App\Services\GoalPresenter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class GoalController extends Controller
             ->orderBy('due_on')
             ->latest()
             ->get()
-            ->map(fn (FinancialGoal $goal): array => GoalPresenter::present($goal))
+            ->map(fn (FinancialGoal $goal): array => GoalResource::make($goal))
             ->values()
             ->all();
 
@@ -35,14 +35,14 @@ class GoalController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        return ApiResponse::success(['goal' => GoalPresenter::present($goal->load('category'))], 'Meta criada com sucesso.', 201);
+        return ApiResponse::success(['goal' => GoalResource::make($goal->load('category'))], 'Meta criada com sucesso.', 201);
     }
 
     public function show(Request $request, FinancialGoal $goal): JsonResponse
     {
         $this->authorizeOwner($request, $goal);
 
-        return ApiResponse::success(['goal' => GoalPresenter::present($goal->load('category'))]);
+        return ApiResponse::success(['goal' => GoalResource::make($goal->load('category'))]);
     }
 
     public function update(Request $request, FinancialGoal $goal): JsonResponse
@@ -50,7 +50,7 @@ class GoalController extends Controller
         $this->authorizeOwner($request, $goal);
         $goal->update($this->payload($request));
 
-        return ApiResponse::success(['goal' => GoalPresenter::present($goal->refresh()->load('category'))], 'Meta atualizada com sucesso.');
+        return ApiResponse::success(['goal' => GoalResource::make($goal->refresh()->load('category'))], 'Meta atualizada com sucesso.');
     }
 
     public function destroy(Request $request, FinancialGoal $goal): JsonResponse

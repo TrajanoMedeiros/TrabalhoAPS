@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\TransactionResource;
 use App\Models\Expense;
 use App\Models\FinancialGoal;
 use App\Models\Income;
@@ -90,7 +91,7 @@ class FinancialSummaryService
             ->latest('occurred_on')
             ->limit(5)
             ->get()
-            ->map(fn (Income $income): array => TransactionPresenter::present($income, 'income'));
+            ->map(fn (Income $income): array => TransactionResource::make($income, 'income'));
 
         $expenses = Expense::query()
             ->with('category')
@@ -98,7 +99,7 @@ class FinancialSummaryService
             ->latest('occurred_on')
             ->limit(5)
             ->get()
-            ->map(fn (Expense $expense): array => TransactionPresenter::present($expense, 'expense'));
+            ->map(fn (Expense $expense): array => TransactionResource::make($expense, 'expense'));
 
         return $incomes
             ->merge($expenses)

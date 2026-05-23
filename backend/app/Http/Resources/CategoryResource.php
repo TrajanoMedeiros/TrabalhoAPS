@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Resources;
 
 use App\Models\Category;
 
-class CategoryPresenter
+class CategoryResource
 {
-    public static function present(Category $category): array
+    public static function make(Category $category): array
     {
         return [
             'id_categoria' => $category->id,

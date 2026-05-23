@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Services\ApiResponse;
-use App\Services\CategoryPresenter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,7 +19,7 @@ class CategoryController extends Controller
             ->orderBy('type')
             ->orderBy('name')
             ->get()
-            ->map(fn (Category $category): array => CategoryPresenter::present($category))
+            ->map(fn (Category $category): array => CategoryResource::make($category))
             ->values()
             ->all();
 
@@ -39,14 +39,14 @@ class CategoryController extends Controller
             'type' => $data['tipo'],
         ]);
 
-        return ApiResponse::success(['category' => CategoryPresenter::present($category)], 'Categoria criada com sucesso.', 201);
+        return ApiResponse::success(['category' => CategoryResource::make($category)], 'Categoria criada com sucesso.', 201);
     }
 
     public function show(Request $request, Category $category): JsonResponse
     {
         $this->authorizeCategory($request, $category);
 
-        return ApiResponse::success(['category' => CategoryPresenter::present($category)]);
+        return ApiResponse::success(['category' => CategoryResource::make($category)]);
     }
 
     public function update(Request $request, Category $category): JsonResponse
@@ -63,7 +63,7 @@ class CategoryController extends Controller
             'type' => $data['tipo'],
         ]);
 
-        return ApiResponse::success(['category' => CategoryPresenter::present($category)], 'Categoria atualizada com sucesso.');
+        return ApiResponse::success(['category' => CategoryResource::make($category)], 'Categoria atualizada com sucesso.');
     }
 
     public function destroy(Request $request, Category $category): JsonResponse

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -71,13 +72,6 @@ class UserController extends Controller
 
     private function presentUser(User $user): array
     {
-        return [
-            'id_usuario' => $user->id,
-            'nome' => $user->name,
-            'email' => $user->email,
-            'tipo_usuario' => $user->account_type,
-            'created_at' => $user->created_at?->toISOString(),
-            'updated_at' => $user->updated_at?->toISOString(),
-        ];
+        return UserResource::make($user);
     }
 }

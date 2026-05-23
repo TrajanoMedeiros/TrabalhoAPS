@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Resources;
 
 use App\Models\Expense;
 use App\Models\Income;
 
-class TransactionPresenter
+class TransactionResource
 {
-    public static function present(Income|Expense $transaction, string $type): array
+    public static function make(Income|Expense $transaction, string $type): array
     {
         return [
             'id' => $transaction->id,

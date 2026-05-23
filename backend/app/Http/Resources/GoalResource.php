@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Resources;
 
 use App\Models\FinancialGoal;
 
-class GoalPresenter
+class GoalResource
 {
-    public static function present(FinancialGoal $goal): array
+    public static function make(FinancialGoal $goal): array
     {
         $target = (float) $goal->target_amount;
         $current = (float) $goal->current_amount;

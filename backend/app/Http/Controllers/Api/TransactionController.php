@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TransactionResource;
 use App\Models\Category;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Services\ApiResponse;
-use App\Services\TransactionPresenter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -34,14 +34,14 @@ class TransactionController extends Controller
     {
         $this->authorizeOwner($request, $income);
 
-        return ApiResponse::success(['income' => TransactionPresenter::present($income->load('category'), 'income')]);
+        return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')]);
     }
 
     public function showExpense(Request $request, Expense $expense): JsonResponse
     {
         $this->authorizeOwner($request, $expense);
 
-        return ApiResponse::success(['expense' => TransactionPresenter::present($expense->load('category'), 'expense')]);
+        return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')]);
     }
 
     public function storeIncome(Request $request): JsonResponse
@@ -49,7 +49,7 @@ class TransactionController extends Controller
         $data = $this->payload($request, 'income');
         $income = Income::query()->create($data + ['user_id' => $request->user()->id]);
 
-        return ApiResponse::success(['income' => TransactionPresenter::present($income->load('category'), 'income')], 'Receita criada com sucesso.', 201);
+        return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')], 'Receita criada com sucesso.', 201);
     }
 
     public function storeExpense(Request $request): JsonResponse
@@ -57,7 +57,7 @@ class TransactionController extends Controller
         $data = $this->payload($request, 'expense');
         $expense = Expense::query()->create($data + ['user_id' => $request->user()->id]);
 
-        return ApiResponse::success(['expense' => TransactionPresenter::present($expense->load('category'), 'expense')], 'Despesa criada com sucesso.', 201);
+        return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')], 'Despesa criada com sucesso.', 201);
     }
 
     public function updateIncome(Request $request, Income $income): JsonResponse
@@ -65,7 +65,7 @@ class TransactionController extends Controller
         $this->authorizeOwner($request, $income);
         $income->update($this->payload($request, 'income'));
 
-        return ApiResponse::success(['income' => TransactionPresenter::present($income->refresh()->load('category'), 'income')], 'Receita atualizada com sucesso.');
+        return ApiResponse::success(['income' => TransactionResource::make($income->refresh()->load('category'), 'income')], 'Receita atualizada com sucesso.');
     }
 
     public function updateExpense(Request $request, Expense $expense): JsonResponse
@@ -73,7 +73,7 @@ class TransactionController extends Controller
         $this->authorizeOwner($request, $expense);
         $expense->update($this->payload($request, 'expense'));
 
-        return ApiResponse::success(['expense' => TransactionPresenter::present($expense->refresh()->load('category'), 'expense')], 'Despesa atualizada com sucesso.');
+        return ApiResponse::success(['expense' => TransactionResource::make($expense->refresh()->load('category'), 'expense')], 'Despesa atualizada com sucesso.');
     }
 
     public function destroyIncome(Request $request, Income $income): JsonResponse
@@ -108,7 +108,7 @@ class TransactionController extends Controller
         return $query->latest('occurred_on')
             ->latest()
             ->get()
-            ->map(fn (Income|Expense $transaction): array => TransactionPresenter::present($transaction, $type))
+            ->map(fn (Income|Expense $transaction): array => TransactionResource::make($transaction, $type))
             ->values()
             ->all();
     }
