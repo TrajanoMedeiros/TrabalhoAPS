@@ -83,6 +83,8 @@ function App() {
         <AssistantPage
           messages={app.chatMessages}
           chatInput={app.chatInput}
+          dashboard={app.dashboard}
+          score={app.score}
           saving={app.saving}
           onChatInputChange={app.setChatInput}
           onSubmit={app.handleChatSubmit}
