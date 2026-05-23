@@ -120,7 +120,10 @@ export function AppShell({
               </div>
             </div>
 
-            <nav className="flex gap-2 overflow-x-auto pb-1 lg:hidden" aria-label="Navegacao mobile">
+            <nav
+              className="grid grid-cols-2 gap-2 pb-1 sm:flex sm:overflow-x-auto lg:hidden"
+              aria-label="Navegacao mobile"
+            >
               {navItems.map((item) => (
                 <NavButton
                   key={item.key}

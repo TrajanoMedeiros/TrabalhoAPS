@@ -21,7 +21,7 @@ export function NavButton({
         active
           ? 'bg-slate-950 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
-      } ${compact ? 'shrink-0' : 'w-full'}`}
+      } ${compact ? 'w-full justify-start sm:w-auto sm:shrink-0' : 'w-full'}`}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
       {item.label}
