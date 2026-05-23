@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: saldoo_postgres
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: saldoo
+      POSTGRES_USER: saldoo
+      POSTGRES_PASSWORD: saldoo
+    volumes:
+      - saldoo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saldoo -d saldoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  saldoo_postgres_data:

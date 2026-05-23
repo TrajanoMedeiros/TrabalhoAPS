@@ -2,17 +2,17 @@
 .env.local
 config.py
 
-/vendor/
-/node_modules/
+node_modules/
+vendor/
 
-/.idea/
-/.vscode/
-/.antigravitycli/
+.idea/
+.vscode/
+.antigravitycli/
 
 __pycache__/
 *.py[cod]
 
-/storage/logs/
-/.phpunit.cache/
+storage/logs/
+.phpunit.cache/
 
 .DS_Store
