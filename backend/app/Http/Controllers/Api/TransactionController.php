@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Transactions\StoreTransactionAction;
+use App\Actions\Transactions\UpdateTransactionAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TransactionRequest;
 use App\Http\Resources\TransactionResource;
-use App\Models\Category;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Services\ApiResponse;
@@ -12,10 +14,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class TransactionController extends Controller
 {
+    public function __construct(
+        private readonly StoreTransactionAction $storeTransaction,
+        private readonly UpdateTransactionAction $updateTransaction,
+    ) {}
+
     public function incomes(Request $request): JsonResponse
     {
         return ApiResponse::success([
@@ -44,36 +50,34 @@ class TransactionController extends Controller
         return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')]);
     }
 
-    public function storeIncome(Request $request): JsonResponse
+    public function storeIncome(TransactionRequest $request): JsonResponse
     {
-        $data = $this->payload($request, 'income');
-        $income = Income::query()->create($data + ['user_id' => $request->user()->id]);
+        $income = $this->storeTransaction->execute($request->user(), 'income', $request->toDto());
 
         return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')], 'Receita criada com sucesso.', 201);
     }
 
-    public function storeExpense(Request $request): JsonResponse
+    public function storeExpense(TransactionRequest $request): JsonResponse
     {
-        $data = $this->payload($request, 'expense');
-        $expense = Expense::query()->create($data + ['user_id' => $request->user()->id]);
+        $expense = $this->storeTransaction->execute($request->user(), 'expense', $request->toDto());
 
         return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')], 'Despesa criada com sucesso.', 201);
     }
 
-    public function updateIncome(Request $request, Income $income): JsonResponse
+    public function updateIncome(TransactionRequest $request, Income $income): JsonResponse
     {
         $this->authorizeOwner($request, $income);
-        $income->update($this->payload($request, 'income'));
+        $income = $this->updateTransaction->execute($request->user(), $income, 'income', $request->toDto());
 
-        return ApiResponse::success(['income' => TransactionResource::make($income->refresh()->load('category'), 'income')], 'Receita atualizada com sucesso.');
+        return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')], 'Receita atualizada com sucesso.');
     }
 
-    public function updateExpense(Request $request, Expense $expense): JsonResponse
+    public function updateExpense(TransactionRequest $request, Expense $expense): JsonResponse
     {
         $this->authorizeOwner($request, $expense);
-        $expense->update($this->payload($request, 'expense'));
+        $expense = $this->updateTransaction->execute($request->user(), $expense, 'expense', $request->toDto());
 
-        return ApiResponse::success(['expense' => TransactionResource::make($expense->refresh()->load('category'), 'expense')], 'Despesa atualizada com sucesso.');
+        return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')], 'Despesa atualizada com sucesso.');
     }
 
     public function destroyIncome(Request $request, Income $income): JsonResponse
@@ -111,37 +115,6 @@ class TransactionController extends Controller
             ->map(fn (Income|Expense $transaction): array => TransactionResource::make($transaction, $type))
             ->values()
             ->all();
-    }
-
-    private function payload(Request $request, string $usage): array
-    {
-        $data = $request->validate([
-            'valor' => ['required', 'numeric', 'gt:0'],
-            'data' => ['required', 'date_format:Y-m-d'],
-            'descricao' => ['nullable', 'string', 'max:500'],
-            'id_categoria' => ['required', 'integer', 'exists:categories,id'],
-        ]);
-
-        $category = Category::query()
-            ->where('id', $data['id_categoria'])
-            ->where(fn (Builder $query): Builder => $query
-                ->whereNull('user_id')
-                ->orWhere('user_id', $request->user()->id)
-            )
-            ->first();
-
-        if (! $category || ! $category->isAvailableFor($usage)) {
-            throw ValidationException::withMessages([
-                'id_categoria' => 'Escolha uma categoria disponivel para o tipo informado.',
-            ]);
-        }
-
-        return [
-            'amount' => round((float) $data['valor'], 2),
-            'occurred_on' => $data['data'],
-            'description' => $data['descricao'] ?? null,
-            'category_id' => $category->id,
-        ];
     }
 
     private function periodFilters(Request $request): array
