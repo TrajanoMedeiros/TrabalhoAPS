@@ -1,6 +1,6 @@
-from app.config import Settings
-from app.providers import AssistantService
-from app.saldoo_client import SaldooApiClient
+from .config import Settings
+from .providers import AssistantService
+from .saldoo_client import SaldooApiClient
 
 
 def run() -> None:

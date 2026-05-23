@@ -1,6 +1,6 @@
-from app.advisor import LocalAdvisor, build_generative_prompt
-from app.config import Settings
-from app.saldoo_client import FinancialContext
+from .advisor import LocalAdvisor, build_generative_prompt
+from .config import Settings
+from .saldoo_client import FinancialContext
 
 try:
     from google import genai

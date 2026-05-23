@@ -1,7 +1,7 @@
 from typing import Any
 import unicodedata
 
-from app.saldoo_client import FinancialContext
+from .saldoo_client import FinancialContext
 
 
 SYSTEM_CONTEXT = (
