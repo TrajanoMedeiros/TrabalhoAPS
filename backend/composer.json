@@ -42,6 +42,7 @@
             "Composer\\Config::disableProcessTimeout",
             "php artisan serve --host=0.0.0.0 --port=8000"
         ],
+        "dev:container": "docker compose -f ../docker/docker-compose.yml up backend",
         "lint": "pint --test",
         "format": "pint",
         "test": [
