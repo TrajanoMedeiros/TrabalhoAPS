@@ -17,7 +17,7 @@ export function NavButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-extrabold transition ${
+      className={`inline-flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-extrabold transition ${
         active
           ? 'bg-slate-950 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'

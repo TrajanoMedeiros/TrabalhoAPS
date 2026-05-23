@@ -16,7 +16,7 @@ export function Alert({
       : 'border-rose-200 bg-rose-50 text-rose-900'
 
   return (
-    <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm font-bold ${classes}`}>
+    <div className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm font-bold ${classes}`}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
       <span>{children}</span>
     </div>

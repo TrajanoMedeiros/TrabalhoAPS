@@ -28,8 +28,8 @@ export function TransactionList({
             className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <div
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
                   isIncome ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
                 }`}
               >
