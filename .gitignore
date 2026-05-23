@@ -4,6 +4,8 @@ config.py
 
 node_modules/
 vendor/
+backend/vendor/
+frontend/dist/
 
 .idea/
 .vscode/
@@ -13,6 +15,8 @@ __pycache__/
 *.py[cod]
 
 storage/logs/
+backend/storage/logs/
 .phpunit.cache/
+backend/.phpunit.result.cache
 
 .DS_Store
