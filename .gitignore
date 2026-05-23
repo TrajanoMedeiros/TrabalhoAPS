@@ -1,6 +1,7 @@
 .env
 .env.local
-config.py
+.venv/
+ia/.venv/
 
 node_modules/
 vendor/
