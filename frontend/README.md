@@ -20,16 +20,22 @@ npm run dev:frontend
 
 ```text
 src/
-  App.tsx             fluxo principal da aplicacao
-  components.tsx      componentes reutilizaveis simples
-  lib/api.ts          cliente HTTP e tratamento de erro
-  lib/format.ts       formatadores de moeda, data e mes
-  types.ts            contratos compartilhados com a API
+  components/  Componentes reutilizaveis e blocos financeiros
+  layouts/     Shell autenticado e navegacao
+  pages/       Telas principais
+  modules/     Fluxos por dominio
+  hooks/       Orquestracao de estado de alto nivel
+  stores/      Estado inicial e constantes
+  services/    Cliente HTTP e erros
+  types/       Contratos TypeScript
+  utils/       Formatadores puros
+  routes/      Itens de navegacao
+  styles/      Tokens visuais
 ```
 
 ## Integracao
 
-O Vite usa proxy para encaminhar `/api` para `http://127.0.0.1:8000`. Com isso, o frontend pode rodar isoladamente enquanto o backend roda localmente ou em container.
+O Vite usa proxy para encaminhar `/api` para `http://127.0.0.1:8000`. Com isso, o frontend roda isoladamente enquanto o backend roda localmente ou em container.
 
 ## UX
 

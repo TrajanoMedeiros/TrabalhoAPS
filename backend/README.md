@@ -1,6 +1,6 @@
 # Saldoo Backend
 
-API REST Laravel do Saldoo. O backend concentra autenticacao JWT, persistencia PostgreSQL, calculos financeiros, score, metas, categorias e assistente financeiro local.
+API REST Laravel do Saldoo. O backend concentra autenticacao JWT, autorizacao administrativa, persistencia PostgreSQL, calculos financeiros, score, metas, categorias e assistente financeiro local.
 
 ## Comandos
 
@@ -30,14 +30,20 @@ php artisan test
 ## Organizacao
 
 ```text
-app/Http/Controllers/Api/   controllers REST
-app/Http/Middleware/        autenticacao JWT
-app/Models/                 modelos Eloquent
-app/Services/               regras financeiras e presenters
-database/migrations/        schema
-database/seeders/           categorias padrao
-routes/api.php              rotas REST
-tests/Feature/              testes de fluxo da API
+app/Http/Controllers/Api/  Controllers REST
+app/Http/Middleware/       JWT e permissao administrativa
+app/Http/Requests/         Validacoes de entrada
+app/Http/Resources/        Serializacao de responses
+app/Actions/               Casos de uso de escrita
+app/DTOs/                  Dados validados entre camadas
+app/Repositories/          Persistencia especifica
+app/Models/                Modelos Eloquent
+app/Services/              JWT, score, dashboard, chat e responses
+app/Modules/Finance/       Dominio financeiro
+database/migrations/       Schema, constraints e indices
+database/seeders/          Categorias e usuarios seedados
+routes/api.php             Rotas REST
+tests/Feature/             Testes de fluxo da API
 ```
 
 ## Banco
@@ -52,6 +58,13 @@ Tokens JWT sao emitidos em `/api/auth/login` e `/api/auth/register`. Rotas prote
 Authorization: Bearer <token>
 ```
 
+Usuarios seedados:
+
+```text
+admin@saldoo.local / Admin@123456
+usuario@saldoo.local / Usuario@123456
+```
+
 ## Padroes Da API
 
 Responses de sucesso seguem:
@@ -62,4 +75,4 @@ Responses de sucesso seguem:
 }
 ```
 
-Erros de validacao e autenticacao retornam JSON padronizado com mensagem e detalhes por campo quando aplicavel.
+Erros de validacao, autenticacao e autorizacao retornam JSON padronizado com mensagem e detalhes por campo quando aplicavel.
