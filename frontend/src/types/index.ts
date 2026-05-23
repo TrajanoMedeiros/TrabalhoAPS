@@ -72,3 +72,86 @@ export type HistoryItem = {
   total_despesas: number
   saldo: number
 }
+
+export type AuthMode = 'login' | 'register'
+
+export type View = 'dashboard' | 'transactions' | 'goals' | 'assistant' | 'settings'
+
+export type TransactionKind = 'income' | 'expense'
+
+export type SavingAction =
+  | 'auth'
+  | 'transaction'
+  | 'goal'
+  | 'goal-progress'
+  | 'category'
+  | 'profile'
+  | 'password'
+  | 'chat'
+  | 'delete'
+  | null
+
+export type AuthPayload = {
+  user: User
+  token: string
+  expires_at: string
+}
+
+export type ChatMessage = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export type ChatPayload = {
+  chat: {
+    resposta: string
+    contexto: {
+      saldo_atual: number
+      total_receitas: number
+      total_despesas: number
+      score: number
+      nivel: string
+    }
+  }
+}
+
+export type AuthForm = {
+  nome: string
+  email: string
+  senha: string
+  tipo_usuario: User['tipo_usuario']
+}
+
+export type TransactionForm = {
+  kind: TransactionKind
+  valor: string
+  data: string
+  descricao: string
+  id_categoria: string
+}
+
+export type GoalForm = {
+  titulo: string
+  valor_alvo: string
+  valor_atual: string
+  data_limite: string
+  id_categoria: string
+}
+
+export type CategoryForm = {
+  nome: string
+  tipo: Category['tipo']
+}
+
+export type ProfileForm = {
+  nome: string
+  email: string
+  tipo_usuario: User['tipo_usuario']
+}
+
+export type PasswordForm = {
+  senha_atual: string
+  nova_senha: string
+}
+
+export type TransactionWithKind = Transaction & { kind: TransactionKind }
