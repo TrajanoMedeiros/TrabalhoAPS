@@ -101,7 +101,7 @@ python ia/chatbot.py
 | `npm run docker:down` | Derruba a stack Docker. |
 | `npm run build` | Executa build de producao do frontend. |
 | `npm run lint` | Executa ESLint do frontend e Pint do backend. |
-| `npm run test` | Executa a suite Laravel no container. |
+| `npm run test` | Executa a suite Laravel no container usando SQLite em memoria. |
 
 ## Variaveis De Ambiente
 
@@ -224,6 +224,8 @@ npm run lint
 npm run build
 npm run test
 ```
+
+A suite automatizada usa SQLite em memoria para nao alterar o PostgreSQL local de desenvolvimento.
 
 Fluxos que devem ser conferidos no navegador:
 

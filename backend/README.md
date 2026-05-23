@@ -27,6 +27,8 @@ Qualidade:
 php artisan test
 ```
 
+Pelo monorepo, `npm run test` executa a suite com SQLite em memoria para preservar o PostgreSQL local.
+
 ## Organizacao
 
 ```text
