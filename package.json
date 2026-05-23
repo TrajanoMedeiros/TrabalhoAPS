@@ -7,12 +7,12 @@
   "scripts": {
     "dev": "npm run dev:docker && concurrently -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "npm --workspace frontend run dev -- --host 0.0.0.0 --port 5173",
-    "dev:backend": "cd backend && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000",
+    "dev:backend": "docker compose -f docker/docker-compose.yml up backend",
     "dev:docker": "docker compose -f docker/docker-compose.yml up -d postgres",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "build": "npm --workspace frontend run build",
-    "lint": "npm --workspace frontend run lint && cd backend && ./vendor/bin/pint --test",
-    "test": "cd backend && php artisan test"
+    "lint": "npm --workspace frontend run lint && docker compose -f docker/docker-compose.yml run --rm backend ./vendor/bin/pint --test",
+    "test": "docker compose -f docker/docker-compose.yml run --rm backend php artisan test"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
