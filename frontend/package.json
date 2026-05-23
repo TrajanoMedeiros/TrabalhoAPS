@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "node --no-deprecation $(npm root)/vite/bin/vite.js",
+    "build": "tsc -b && node --no-deprecation $(npm root)/vite/bin/vite.js build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "node --no-deprecation $(npm root)/vite/bin/vite.js preview"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
