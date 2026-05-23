@@ -17,8 +17,6 @@ services:
   db:
     image: postgres:16-alpine
     container_name: saldoo_db
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: finance_db
       POSTGRES_USER: finance_user
