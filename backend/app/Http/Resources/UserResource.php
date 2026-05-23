@@ -13,6 +13,7 @@ class UserResource
             'nome' => $user->name,
             'email' => $user->email,
             'tipo_usuario' => $user->account_type,
+            'papel' => $user->role,
             'created_at' => $user->created_at?->toISOString(),
             'updated_at' => $user->updated_at?->toISOString(),
         ];

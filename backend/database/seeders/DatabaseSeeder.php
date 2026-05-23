@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -26,5 +27,25 @@ class DatabaseSeeder extends Seeder
             'name' => $category['name'],
             'type' => $category['type'],
         ]));
+
+        User::query()->updateOrCreate(
+            ['email' => 'admin@saldoo.local'],
+            [
+                'name' => 'Admin Saldoo',
+                'password' => 'Admin@123456',
+                'account_type' => 'business',
+                'role' => User::ROLE_ADMIN,
+            ],
+        );
+
+        User::query()->updateOrCreate(
+            ['email' => 'usuario@saldoo.local'],
+            [
+                'name' => 'Usuario Saldoo',
+                'password' => 'Usuario@123456',
+                'account_type' => 'personal',
+                'role' => User::ROLE_USER,
+            ],
+        );
     }
 }

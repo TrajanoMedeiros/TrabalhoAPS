@@ -66,4 +66,41 @@ class FinancialApiTest extends TestCase
             ->assertOk()
             ->assertJsonStructure(['data' => ['chat' => ['resposta', 'contexto']]]);
     }
+
+    public function test_seeded_admin_can_access_admin_overview(): void
+    {
+        $this->seed();
+
+        $adminToken = $this->postJson('/api/auth/login', [
+            'email' => 'admin@saldoo.local',
+            'senha' => 'Admin@123456',
+        ])->assertOk()
+            ->assertJsonPath('data.user.papel', 'admin')
+            ->json('data.token');
+
+        $userToken = $this->postJson('/api/auth/login', [
+            'email' => 'usuario@saldoo.local',
+            'senha' => 'Usuario@123456',
+        ])->assertOk()
+            ->assertJsonPath('data.user.papel', 'user')
+            ->json('data.token');
+
+        $this->withToken($userToken)
+            ->getJson('/api/admin/overview')
+            ->assertForbidden()
+            ->assertJsonPath('error.message', 'Acesso restrito a administradores.');
+
+        $this->withToken($adminToken)
+            ->getJson('/api/admin/overview')
+            ->assertOk()
+            ->assertJsonPath('data.overview.usuarios.administradores', 1)
+            ->assertJsonStructure([
+                'data' => [
+                    'overview' => [
+                        'usuarios' => ['total', 'administradores', 'comuns'],
+                        'financeiro' => ['receitas_total', 'despesas_total', 'saldo_total', 'metas_total'],
+                    ],
+                ],
+            ]);
+    }
 }

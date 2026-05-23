@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
@@ -48,4 +49,8 @@ Route::middleware('auth.jwt')->group(function (): void {
     Route::get('/dashboard/history', [DashboardController::class, 'history']);
     Route::get('/score', [ScoreController::class, 'show']);
     Route::post('/chat', [ChatController::class, 'ask']);
+
+    Route::middleware('admin')->prefix('admin')->group(function (): void {
+        Route::get('/overview', [AdminController::class, 'overview']);
+    });
 });

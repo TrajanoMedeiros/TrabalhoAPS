@@ -10,10 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'account_type'])]
+#[Fillable(['name', 'email', 'password', 'account_type', 'role'])]
 #[Hidden(['password'])]
 class User extends Authenticatable
 {
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_USER = 'user';
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -47,5 +51,10 @@ class User extends Authenticatable
     public function goals(): HasMany
     {
         return $this->hasMany(FinancialGoal::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 }

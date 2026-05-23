@@ -16,4 +16,19 @@ class ApiResponse
 
         return response()->json($payload, $status);
     }
+
+    public static function error(string $message, int $status = 400, array $details = []): JsonResponse
+    {
+        $payload = [
+            'error' => [
+                'message' => $message,
+            ],
+        ];
+
+        if ($details !== []) {
+            $payload['error']['details'] = $details;
+        }
+
+        return response()->json($payload, $status);
+    }
 }
