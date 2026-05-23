@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    container_name: saldoo_app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: postgres:16-alpine
+    container_name: saldoo_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: finance_db
+      POSTGRES_USER: finance_user
+      POSTGRES_PASSWORD: finance_pass
+    volumes:
+      - saldoo_pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance_user -d finance_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  saldoo_pgdata:
