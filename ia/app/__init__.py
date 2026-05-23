@@ -1,0 +1,1 @@
+"""Saldoo assistant package."""
