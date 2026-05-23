@@ -85,7 +85,7 @@ export function AppShell({
                   aria-label="Mes"
                   value={month}
                   onChange={(event) => onMonthChange(Number(event.target.value))}
-                  className={`${inputClass} min-w-28`}
+                  className={`${inputClass} w-full min-w-28 sm:w-auto`}
                 >
                   {Array.from({ length: 12 }, (_, index) => index + 1).map((option) => (
                     <option key={option} value={option}>
@@ -97,7 +97,7 @@ export function AppShell({
                   aria-label="Ano"
                   value={year}
                   onChange={(event) => onYearChange(Number(event.target.value))}
-                  className={`${inputClass} min-w-24`}
+                  className={`${inputClass} w-full min-w-24 sm:w-auto`}
                 >
                   {years.map((option) => (
                     <option key={option} value={option}>
