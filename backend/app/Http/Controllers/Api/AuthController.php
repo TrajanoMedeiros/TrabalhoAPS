@@ -30,6 +30,7 @@ class AuthController extends Controller
             'email' => mb_strtolower($data['email']),
             'password' => $data['senha'],
             'account_type' => $data['tipo_usuario'] ?? 'personal',
+            'role' => User::ROLE_USER,
         ]);
 
         $token = $this->jwt->issue($user);

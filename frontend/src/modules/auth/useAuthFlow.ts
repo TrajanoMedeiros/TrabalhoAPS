@@ -46,13 +46,13 @@ export function useAuthFlow({
       const payload =
         authMode === 'register'
           ? {
-              nome: authForm.nome,
-              email: authForm.email,
+              nome: authForm.nome.trim(),
+              email: authForm.email.trim().toLowerCase(),
               senha: authForm.senha,
               tipo_usuario: authForm.tipo_usuario,
             }
           : {
-              email: authForm.email,
+              email: authForm.email.trim().toLowerCase(),
               senha: authForm.senha,
             }
 

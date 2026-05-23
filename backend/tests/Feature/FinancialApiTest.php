@@ -19,6 +19,7 @@ class FinancialApiTest extends TestCase
             'senha' => 'Senha123',
             'tipo_usuario' => 'personal',
         ])->assertCreated()
+            ->assertJsonPath('data.user.papel', 'user')
             ->json('data.token');
 
         $categories = $this->withToken($token)
