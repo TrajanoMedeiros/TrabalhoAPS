@@ -1,33 +1,41 @@
 <?php
 
-class Database {
-    private static $instance = null;
-    private $pdo;
+declare(strict_types=1);
 
-    private function __construct() {
-        $host = getenv('DB_HOST') ?: 'db';
-        $port = getenv('DB_PORT') ?: '5432';
-        $db   = getenv('DB_NAME') ?: 'finance_db';
-        $user = getenv('DB_USER') ?: 'finance_user';
-        $pass = getenv('DB_PASS') ?: 'finance_pass';
+namespace App;
 
-        $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
-        try {
-            $this->pdo = new PDO($dsn, $user, $pass, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-            ]);
-        } catch (\PDOException $e) {
-            http_response_code(500);
-            echo json_encode(["error" => "Database connection failed", "details" => $e->getMessage()]);
-            exit;
+use App\Support\Env;
+use PDO;
+
+final class Database
+{
+    private static ?PDO $connection = null;
+
+    public static function connection(): PDO
+    {
+        if (self::$connection instanceof PDO) {
+            return self::$connection;
         }
+
+        $dsn = Env::get('DB_DSN');
+        if ($dsn === null || $dsn === '') {
+            $host = Env::get('DB_HOST', 'db');
+            $port = Env::get('DB_PORT', '5432');
+            $name = Env::get('DB_NAME', 'finance_db');
+            $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name);
+        }
+
+        self::$connection = new PDO($dsn, Env::get('DB_USER', 'finance_user'), Env::get('DB_PASS', 'finance_pass'), [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
+
+        return self::$connection;
     }
 
-    public static function getConnection() {
-        if (self::$instance === null) {
-            self::$instance = new Database();
-        }
-        return self::$instance->pdo;
+    public static function reset(): void
+    {
+        self::$connection = null;
     }
 }

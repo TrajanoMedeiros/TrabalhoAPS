@@ -1,84 +1,87 @@
 <?php
 
-class CategoryController {
-    
-    public function index() {
-        $userId = Middleware::auth();
+declare(strict_types=1);
 
-        $categories = Category::findAll();
+namespace App\Controllers;
 
-        header('Content-Type: application/json');
-        echo json_encode($categories);
+use App\Http\HttpException;
+use App\Http\JsonResponse;
+use App\Http\Request;
+use App\Repositories\CategoryRepository;
+use App\Support\Auth;
+use App\Support\Validator;
+
+final class CategoryController
+{
+    private CategoryRepository $categories;
+
+    public function __construct()
+    {
+        $this->categories = new CategoryRepository();
     }
 
-    public function show($id) {
-        $userId = Middleware::auth();
-
-        $category = Category::findById($id);
-        if (!$category) {
-            http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(["error" => "Category not found"]);
-            return;
-        }
-
-        header('Content-Type: application/json');
-        echo json_encode($category);
+    public function index(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        return JsonResponse::success(['categories' => $this->categories->findAllForUser($userId)]);
     }
 
-    public function store() {
-        $userId = Middleware::auth();
-
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['nome'])) {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(["error" => "Missing required field: nome"]);
-            return;
+    public function show(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $category = $this->categories->findByIdForUser($this->id($params), $userId);
+        if ($category === null) {
+            throw new HttpException(404, 'Categoria nao encontrada.');
         }
 
-        $category = Category::create($data['nome']);
-
-        http_response_code(201);
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Category created successfully", "data" => $category]);
+        return JsonResponse::success(['category' => $category]);
     }
 
-    public function update($id) {
-        $userId = Middleware::auth();
+    public function store(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $data = Validator::make($request->json())
+            ->requiredString('nome', 'Nome', 80, 2)
+            ->enum('tipo', ['income', 'expense', 'both'], 'both')
+            ->validate();
 
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['nome'])) {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(["error" => "Missing required field: nome"]);
-            return;
-        }
-
-        $rowCount = Category::update($id, $data['nome']);
-        if ($rowCount === 0) {
-            http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(["error" => "Category not found"]);
-            return;
-        }
-
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Category updated successfully"]);
+        return JsonResponse::success([
+            'category' => $this->categories->createForUser($userId, $data),
+        ], 'Categoria criada com sucesso.', 201);
     }
 
-    public function destroy($id) {
-        $userId = Middleware::auth();
+    public function update(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $data = Validator::make($request->json())
+            ->requiredString('nome', 'Nome', 80, 2)
+            ->enum('tipo', ['income', 'expense', 'both'], 'both')
+            ->validate();
 
-        $rowCount = Category::delete($id);
-        if ($rowCount === 0) {
-            http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(["error" => "Category not found"]);
-            return;
+        $category = $this->categories->updateForUser($this->id($params), $userId, $data);
+        if ($category === null) {
+            throw new HttpException(404, 'Categoria propria nao encontrada.');
         }
 
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Category deleted successfully"]);
+        return JsonResponse::success(['category' => $category], 'Categoria atualizada com sucesso.');
+    }
+
+    public function destroy(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        if (!$this->categories->deleteForUser($this->id($params), $userId)) {
+            throw new HttpException(404, 'Categoria propria nao encontrada.');
+        }
+
+        return JsonResponse::success([], 'Categoria removida com sucesso.');
+    }
+
+    private function id(array $params): int
+    {
+        if (!isset($params['id']) || !ctype_digit((string) $params['id'])) {
+            throw new HttpException(404, 'Categoria nao encontrada.');
+        }
+
+        return (int) $params['id'];
     }
 }

@@ -1,91 +1,106 @@
 <?php
 
-class UserController {
+declare(strict_types=1);
 
-    public function show() {
-        $userId = Middleware::auth();
-        $user = User::findById($userId);
-        if (!$user) {
-            http_response_code(404);
-            echo json_encode(["error" => "User not found"]);
-            return;
-        }
-        header('Content-Type: application/json');
-        echo json_encode($user);
+namespace App\Controllers;
+
+use App\Http\HttpException;
+use App\Http\JsonResponse;
+use App\Http\Request;
+use App\Http\ValidationException;
+use App\Repositories\UserRepository;
+use App\Support\Auth;
+use App\Support\Validator;
+
+final class UserController
+{
+    private UserRepository $users;
+
+    public function __construct()
+    {
+        $this->users = new UserRepository();
     }
 
-    public function update() {
-        $userId = Middleware::auth();
-        $data = json_decode(file_get_contents("php://input"), true);
+    public function show(Request $request, array $params): JsonResponse
+    {
+        $user = $this->requireUser($request);
+        return JsonResponse::success(['user' => $user]);
+    }
 
-        if (empty($data)) {
-            http_response_code(400);
-            echo json_encode(["error" => "No data provided"]);
-            return;
+    public function update(Request $request, array $params): JsonResponse
+    {
+        $user = $this->requireUser($request);
+        $body = $request->json();
+        $data = [];
+
+        if (array_key_exists('nome', $body)) {
+            $data['nome'] = Validator::make(['nome' => $body['nome']])
+                ->requiredString('nome', 'Nome', 120, 2)
+                ->validate()['nome'];
         }
 
-       
-        $allowed = [];
-        if (isset($data['nome'])) $allowed['nome'] = $data['nome'];
-        if (isset($data['email'])) $allowed['email'] = $data['email'];
-
-        if (empty($allowed)) {
-            http_response_code(400);
-            echo json_encode(["error" => "No valid fields to update (allowed: nome, email)"]);
-            return;
-        }
-
-         
-        if (isset($allowed['email'])) {
-            $existing = User::findByEmail($allowed['email']);
-            if ($existing && $existing['id_usuario'] != $userId) {
-                http_response_code(400);
-                echo json_encode(["error" => "Email already in use"]);
-                return;
+        if (array_key_exists('email', $body)) {
+            $email = Validator::make(['email' => $body['email']])
+                ->requiredEmail()
+                ->validate()['email'];
+            $existing = $this->users->findByEmail($email);
+            if ($existing !== null && (int) $existing['id_usuario'] !== $user['id_usuario']) {
+                throw new HttpException(409, 'Este email ja esta em uso.');
             }
+            $data['email'] = $email;
         }
 
-        User::update($userId, $allowed);
-        $user = User::findById($userId);
+        if (array_key_exists('tipo_usuario', $body)) {
+            $data['tipo_usuario'] = Validator::make(['tipo_usuario' => $body['tipo_usuario']])
+                ->enum('tipo_usuario', ['personal', 'business'])
+                ->validate()['tipo_usuario'];
+        }
 
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Profile updated successfully", "data" => $user]);
+        if ($data === []) {
+            throw new ValidationException('Nenhum campo valido informado.', [
+                'campos' => 'Use nome, email ou tipo_usuario.',
+            ]);
+        }
+
+        return JsonResponse::success([
+            'user' => $this->users->update($user['id_usuario'], $data),
+        ], 'Perfil atualizado com sucesso.');
     }
 
-    public function changePassword() {
-        $userId = Middleware::auth();
-        $data = json_decode(file_get_contents("php://input"), true);
+    public function changePassword(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $data = Validator::make($request->json())
+            ->requiredString('senha_atual', 'Senha atual', 255)
+            ->requiredPassword('nova_senha')
+            ->validate();
 
-        if (!isset($data['senha_atual']) || !isset($data['nova_senha'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Missing fields: senha_atual, nova_senha"]);
-            return;
+        $stored = $this->users->findByEmail($this->requireUser($request)['email']);
+        if ($stored === null || !password_verify($data['senha_atual'], $stored['senha'])) {
+            throw new ValidationException('Senha atual incorreta.', ['senha_atual' => 'Confira sua senha atual.']);
         }
 
-        
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT senha FROM users WHERE id_usuario = ?");
-        $stmt->execute([$userId]);
-        $row = $stmt->fetch();
+        $this->users->updatePassword($userId, password_hash($data['nova_senha'], PASSWORD_DEFAULT));
 
-        if (!$row || !password_verify($data['senha_atual'], $row['senha'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Current password is incorrect"]);
-            return;
-        }
-
-        $newHash = password_hash($data['nova_senha'], PASSWORD_DEFAULT);
-        User::updatePassword($userId, $newHash);
-
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Password changed successfully"]);
+        return JsonResponse::success([], 'Senha atualizada com sucesso.');
     }
 
-    public function destroy() {
-        $userId = Middleware::auth();
-        User::delete($userId);
+    public function destroy(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $this->users->delete($userId);
 
-        header('Content-Type: application/json');
-        echo json_encode(["message" => "Account deleted successfully"]);
+        return JsonResponse::success([], 'Conta removida com sucesso.');
+    }
+
+    private function requireUser(Request $request): array
+    {
+        $userId = Auth::userId($request);
+        $user = $this->users->findById($userId);
+        if ($user === null) {
+            throw new HttpException(404, 'Usuario nao encontrado.');
+        }
+
+        return $user;
     }
 }

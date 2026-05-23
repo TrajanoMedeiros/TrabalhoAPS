@@ -1,133 +1,44 @@
 <?php
 
-class DashboardController {
+declare(strict_types=1);
 
-    public function getDashboard() {
-        $userId = Middleware::auth();
+namespace App\Controllers;
 
+use App\Http\JsonResponse;
+use App\Http\Request;
+use App\Http\ValidationException;
+use App\Services\DashboardService;
+use App\Support\Auth;
+use App\Support\Validator;
 
-        $filters = [];
-        if (isset($_GET['mes'])) $filters['mes'] = (int) $_GET['mes'];
-        if (isset($_GET['ano'])) $filters['ano'] = (int) $_GET['ano'];
+final class DashboardController
+{
+    private DashboardService $dashboard;
 
-        // Totals (with optional month/year filter)
-        $totalIncome = Income::getTotal($userId, $filters);
-        $totalExpense = Expense::getTotal($userId, $filters);
-        $saldoAtual = $totalIncome - $totalExpense;
+    public function __construct()
+    {
+        $this->dashboard = new DashboardService();
+    }
 
-        $pdo = Database::getConnection();
-
-
-        $distQuery = "
-            SELECT c.nome as categoria, SUM(d.valor) as total 
-            FROM expenses d 
-            JOIN categories c ON d.id_categoria = c.id_categoria 
-            WHERE d.id_usuario = ?
-        ";
-        $distParams = [$userId];
-
-        if (isset($filters['mes'])) {
-            $distQuery .= " AND EXTRACT(MONTH FROM d.data) = ?";
-            $distParams[] = $filters['mes'];
-        }
-        if (isset($filters['ano'])) {
-            $distQuery .= " AND EXTRACT(YEAR FROM d.data) = ?";
-            $distParams[] = $filters['ano'];
-        }
-
-        $distQuery .= " GROUP BY c.nome ORDER BY total DESC";
-        $stmtDist = $pdo->prepare($distQuery);
-        $stmtDist->execute($distParams);
-        $distribuicao = $stmtDist->fetchAll();
-
-
-        $incDistQuery = "
-            SELECT c.nome as categoria, SUM(r.valor) as total 
-            FROM incomes r 
-            JOIN categories c ON r.id_categoria = c.id_categoria 
-            WHERE r.id_usuario = ?
-        ";
-        $incDistParams = [$userId];
-
-        if (isset($filters['mes'])) {
-            $incDistQuery .= " AND EXTRACT(MONTH FROM r.data) = ?";
-            $incDistParams[] = $filters['mes'];
-        }
-        if (isset($filters['ano'])) {
-            $incDistQuery .= " AND EXTRACT(YEAR FROM r.data) = ?";
-            $incDistParams[] = $filters['ano'];
-        }
-
-        $incDistQuery .= " GROUP BY c.nome ORDER BY total DESC";
-        $stmtIncDist = $pdo->prepare($incDistQuery);
-        $stmtIncDist->execute($incDistParams);
-        $distribuicaoReceitas = $stmtIncDist->fetchAll();
-
-
-        $goals = FinancialGoal::findAllByUser($userId);
-        $goalsTotal = 0;
-        $goalsProgress = 0;
-        foreach ($goals as $goal) {
-            $goalsTotal += (float) $goal['valor_alvo'];
-            $goalsProgress += (float) $goal['valor_atual'];
-        }
-
-
-        $stmtRecentInc = $pdo->prepare("
-            SELECT r.id_receita as id, r.valor, r.data, r.descricao, c.nome as categoria, 'receita' as tipo
-            FROM incomes r 
-            LEFT JOIN categories c ON r.id_categoria = c.id_categoria 
-            WHERE r.id_usuario = ? 
-            ORDER BY r.data DESC, r.created_at DESC 
-            LIMIT 5
-        ");
-        $stmtRecentInc->execute([$userId]);
-        $recentIncomes = $stmtRecentInc->fetchAll();
-
-        $stmtRecentExp = $pdo->prepare("
-            SELECT d.id_despesa as id, d.valor, d.data, d.descricao, c.nome as categoria, 'despesa' as tipo
-            FROM expenses d 
-            LEFT JOIN categories c ON d.id_categoria = c.id_categoria 
-            WHERE d.id_usuario = ? 
-            ORDER BY d.data DESC, d.created_at DESC 
-            LIMIT 5
-        ");
-        $stmtRecentExp->execute([$userId]);
-        $recentExpenses = $stmtRecentExp->fetchAll();
-
-
-        $recentTransactions = array_merge($recentIncomes, $recentExpenses);
-        usort($recentTransactions, function($a, $b) {
-            return strtotime($b['data']) - strtotime($a['data']);
-        });
-        $recentTransactions = array_slice($recentTransactions, 0, 10);
-
-        header('Content-Type: application/json');
-        echo json_encode([
-            "saldo_atual" => (float) $saldoAtual,
-            "total_receitas" => (float) $totalIncome,
-            "total_despesas" => (float) $totalExpense,
-            "distribuicao_gastos" => $distribuicao,
-            "distribuicao_receitas" => $distribuicaoReceitas,
-            "metas" => [
-                "total" => count($goals),
-                "valor_alvo_total" => (float) $goalsTotal,
-                "valor_atual_total" => (float) $goalsProgress,
-                "progresso_percentual" => $goalsTotal > 0 ? round(($goalsProgress / $goalsTotal) * 100, 1) : 0
-            ],
-            "transacoes_recentes" => $recentTransactions
+    public function getDashboard(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        return JsonResponse::success([
+            'dashboard' => $this->dashboard->summary($userId, Validator::periodFilters($request)),
         ]);
     }
 
-    public function getMonthlyHistory() {
-        $userId = Middleware::auth();
+    public function getMonthlyHistory(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $months = $request->query('meses', 6);
+        $months = filter_var($months, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 24]]);
+        if ($months === false) {
+            throw new ValidationException('Filtro invalido.', ['meses' => 'Informe um valor entre 1 e 24.']);
+        }
 
-        $months = isset($_GET['meses']) ? (int) $_GET['meses'] : 6;
-        $months = max(1, min(24, $months)); // Clamp between 1 and 24
-
-        $history = FinancialHistory::getMonthlyHistory($userId, $months);
-
-        header('Content-Type: application/json');
-        echo json_encode($history);
+        return JsonResponse::success([
+            'history' => $this->dashboard->monthlyHistory($userId, $months),
+        ]);
     }
 }

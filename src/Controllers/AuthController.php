@@ -1,87 +1,85 @@
 <?php
 
-class AuthController {
-    
-    // Simple mock JWT token generation for the "basico bem feito" requirement
-    private function generateToken($userId) {
-        $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
-        $payload = base64_encode(json_encode(['user_id' => $userId, 'exp' => time() + 3600]));
-        $signature = hash_hmac('sha256', "$header.$payload", 'secret_key', true);
-        return "$header.$payload." . base64_encode($signature);
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Http\AuthenticationException;
+use App\Http\HttpException;
+use App\Http\JsonResponse;
+use App\Http\Request;
+use App\Repositories\UserRepository;
+use App\Support\Auth;
+use App\Support\Jwt;
+use App\Support\Validator;
+
+final class AuthController
+{
+    private UserRepository $users;
+
+    public function __construct()
+    {
+        $this->users = new UserRepository();
     }
 
-    public function register() {
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (!isset($data['nome']) || !isset($data['email']) || !isset($data['senha'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Missing fields"]);
-            return;
+    public function register(Request $request, array $params): JsonResponse
+    {
+        $data = Validator::make($request->json())
+            ->requiredString('nome', 'Nome', 120, 2)
+            ->requiredEmail()
+            ->requiredPassword()
+            ->enum('tipo_usuario', ['personal', 'business'], 'personal')
+            ->validate();
+
+        if ($this->users->findByEmail($data['email']) !== null) {
+            throw new HttpException(409, 'Este email ja esta em uso.');
         }
 
-        $pdo = Database::getConnection();
-        
-        // Check if email exists
-        $stmt = $pdo->prepare("SELECT id_usuario FROM users WHERE email = ?");
-        $stmt->execute([$data['email']]);
-        if ($stmt->fetch()) {
-            http_response_code(400);
-            echo json_encode(["error" => "Email already in use"]);
-            return;
-        }
+        $user = $this->users->create([
+            'nome' => $data['nome'],
+            'email' => $data['email'],
+            'senha' => password_hash($data['senha'], PASSWORD_DEFAULT),
+            'tipo_usuario' => $data['tipo_usuario'],
+        ]);
+        $token = Jwt::issue($user['id_usuario'], $user['email']);
 
-        $hashedPassword = password_hash($data['senha'], PASSWORD_DEFAULT);
-
-        $stmt = $pdo->prepare("INSERT INTO users (nome, email, senha) VALUES (?, ?, ?) RETURNING id_usuario");
-        $stmt->execute([$data['nome'], $data['email'], $hashedPassword]);
-        $user = $stmt->fetch();
-        
-        // Create history entry
-        $stmtHistory = $pdo->prepare("INSERT INTO financial_histories (id_usuario) VALUES (?)");
-        $stmtHistory->execute([$user['id_usuario']]);
-
-        $token = $this->generateToken($user['id_usuario']);
-
-        http_response_code(201);
-        echo json_encode(["message" => "User registered successfully", "token" => $token]);
+        return JsonResponse::success([
+            'user' => $user,
+            'token' => $token['token'],
+            'expires_at' => $token['expires_at'],
+        ], 'Conta criada com sucesso.', 201);
     }
 
-    public function login() {
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (!isset($data['email']) || !isset($data['senha'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Missing fields"]);
-            return;
+    public function login(Request $request, array $params): JsonResponse
+    {
+        $data = Validator::make($request->json())
+            ->requiredEmail()
+            ->requiredString('senha', 'Senha', 255)
+            ->validate();
+
+        $user = $this->users->findByEmail($data['email']);
+        if ($user === null || !password_verify($data['senha'], $user['senha'])) {
+            throw new AuthenticationException('Email ou senha invalidos.');
         }
 
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT id_usuario, senha FROM users WHERE email = ?");
-        $stmt->execute([$data['email']]);
-        $user = $stmt->fetch();
+        $publicUser = $this->users->findById((int) $user['id_usuario']);
+        $token = Jwt::issue((int) $user['id_usuario'], $user['email']);
 
-        if ($user && password_verify($data['senha'], $user['senha'])) {
-            $token = $this->generateToken($user['id_usuario']);
-            echo json_encode(["message" => "Login successful", "token" => $token]);
-        } else {
-            http_response_code(401);
-            echo json_encode(["error" => "Invalid credentials"]);
-        }
+        return JsonResponse::success([
+            'user' => $publicUser,
+            'token' => $token['token'],
+            'expires_at' => $token['expires_at'],
+        ], 'Login realizado com sucesso.');
     }
 
-    // Static helper to get authenticated user from request header
-    public static function getAuthenticatedUserId() {
-        $headers = apache_request_headers();
-        if (isset($headers['Authorization'])) {
-            $token = str_replace('Bearer ', '', $headers['Authorization']);
-            $parts = explode('.', $token);
-            if (count($parts) === 3) {
-                $payload = json_decode(base64_decode($parts[1]), true);
-                if (isset($payload['user_id'])) {
-                    return $payload['user_id'];
-                }
-            }
+    public function me(Request $request, array $params): JsonResponse
+    {
+        $userId = Auth::userId($request);
+        $user = $this->users->findById($userId);
+        if ($user === null) {
+            throw new AuthenticationException('Usuario autenticado nao encontrado.');
         }
-        return null;
+
+        return JsonResponse::success(['user' => $user]);
     }
 }
