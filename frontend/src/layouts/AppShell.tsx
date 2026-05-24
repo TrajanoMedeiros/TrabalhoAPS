@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { CalendarDays, CheckCircle2, Loader2, LogOut, ShieldCheck } from 'lucide-react'
 import { Alert } from '../components/Alert'
 import { Brand } from '../components/Brand'
+import { MobileNav } from '../components/MobileNav'
 import { NavButton } from '../components/NavButton'
 import { PageTitle } from '../components/PageTitle'
 import { Button } from '../components/ui'
@@ -69,9 +70,9 @@ export function AppShell({
 
       <div className="lg:pl-64">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="lg:hidden">
+          <div className="mx-auto grid max-w-7xl gap-3 px-4 py-3 sm:px-6 lg:flex lg:items-center lg:justify-between lg:px-8">
+            <div className="flex items-center justify-between gap-3">
+              <div className="shrink-0 lg:hidden">
                 <Brand />
               </div>
               <div className="hidden lg:block">
@@ -80,60 +81,48 @@ export function AppShell({
                   {monthName(month)} de {year}
                 </h1>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <select
-                  aria-label="Mes"
-                  value={month}
-                  onChange={(event) => onMonthChange(Number(event.target.value))}
-                  className={`${inputClass} w-full min-w-28 sm:w-auto`}
-                >
-                  {Array.from({ length: 12 }, (_, index) => index + 1).map((option) => (
-                    <option key={option} value={option}>
-                      {monthName(option)}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  aria-label="Ano"
-                  value={year}
-                  onChange={(event) => onYearChange(Number(event.target.value))}
-                  className={`${inputClass} w-full min-w-24 sm:w-auto`}
-                >
-                  {years.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <Button variant="ghost" onClick={onRefresh} disabled={loading}>
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
-                  )}
-                  Atualizar
-                </Button>
-                <Button variant="danger" onClick={onLogout}>
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  Sair
-                </Button>
-              </div>
             </div>
 
-            <nav
-              className="grid grid-cols-2 gap-2 pb-1 sm:flex sm:overflow-x-auto lg:hidden"
-              aria-label="Navegacao mobile"
-            >
-              {navItems.map((item) => (
-                <NavButton
-                  key={item.key}
-                  item={item}
-                  active={activeView === item.key}
-                  onClick={() => onViewChange(item.key)}
-                  compact
-                />
-              ))}
-            </nav>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+              <select
+                aria-label="Mes"
+                value={month}
+                onChange={(event) => onMonthChange(Number(event.target.value))}
+                className={`${inputClass} min-h-11 sm:w-auto sm:min-w-28`}
+              >
+                {Array.from({ length: 12 }, (_, index) => index + 1).map((option) => (
+                  <option key={option} value={option}>
+                    {monthName(option)}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="Ano"
+                value={year}
+                onChange={(event) => onYearChange(Number(event.target.value))}
+                className={`${inputClass} min-h-11 sm:w-auto sm:min-w-24`}
+              >
+                {years.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <Button variant="ghost" onClick={onRefresh} disabled={loading} className="min-h-11">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                )}
+                Atualizar
+              </Button>
+              <Button variant="danger" onClick={onLogout} className="min-h-11">
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sair
+              </Button>
+            </div>
+
+            <MobileNav activeView={activeView} onViewChange={onViewChange} />
           </div>
         </header>
 

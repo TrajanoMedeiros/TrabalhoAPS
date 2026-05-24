@@ -16,8 +16,9 @@ export function NavButton({
   return (
     <button
       type="button"
+      aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={`inline-flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-extrabold transition ${
+      className={`inline-flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-extrabold transition duration-200 ${
         active
           ? 'bg-slate-950 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
