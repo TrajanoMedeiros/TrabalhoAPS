@@ -24,7 +24,7 @@ export function MobileNav({
             aria-label={item.label}
             aria-current={active ? 'page' : undefined}
             onClick={() => onViewChange(item.key)}
-            className={`grid min-h-12 min-w-0 place-items-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-extrabold transition duration-200 sm:inline-flex sm:gap-2 sm:text-sm ${
+            className={`grid min-h-12 min-w-0 place-items-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-extrabold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 sm:inline-flex sm:gap-2 sm:text-sm ${
               active
                 ? 'bg-slate-950 text-white shadow-sm'
                 : 'text-slate-500 hover:bg-slate-100 hover:text-slate-950'

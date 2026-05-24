@@ -126,7 +126,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:px-8">
+        <main className="surface-enter mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:px-8">
           <PageTitle activeView={activeView} user={user} />
 
           {error && (

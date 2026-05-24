@@ -25,7 +25,7 @@ export function TransactionList({
         return (
           <article
             key={`${transaction.kind}-${transaction.id}`}
-            className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0"
+            className="flex items-center justify-between gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50"
           >
             <div className="flex min-w-0 items-center gap-3">
                   <div
