@@ -1,5 +1,7 @@
 import type { FormEvent } from 'react'
 import { Loader2, Plus, Target, Trash2 } from 'lucide-react'
+import { DateInput } from '../components/form/DateInput'
+import { SelectInput } from '../components/form/SelectInput'
 import { Button, EmptyState, Field, Panel } from '../components/ui'
 import { inputClass } from '../styles/tokens'
 import type { Category, Goal, GoalForm, SavingAction } from '../types'
@@ -25,7 +27,7 @@ export function GoalsPage({
   onDelete: (goal: Goal) => void
 }) {
   return (
-    <section className="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-[0.78fr_1.22fr]">
       <Panel title="Nova meta">
         <form onSubmit={onSubmit} className="grid gap-4">
           <Field label="Titulo">
@@ -69,30 +71,27 @@ export function GoalsPage({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Prazo">
-              <input
-                type="date"
+              <DateInput
                 value={goalForm.data_limite}
-                onChange={(event) =>
-                  onGoalFormChange({ ...goalForm, data_limite: event.target.value })
-                }
-                className={inputClass}
+                ariaLabel="Prazo da meta"
+                placeholder="Sem prazo"
+                onChange={(data_limite) => onGoalFormChange({ ...goalForm, data_limite })}
               />
             </Field>
             <Field label="Categoria">
-              <select
+              <SelectInput
                 value={goalForm.id_categoria}
-                onChange={(event) =>
-                  onGoalFormChange({ ...goalForm, id_categoria: event.target.value })
-                }
-                className={inputClass}
-              >
-                <option value="">Sem categoria</option>
-                {categories.map((category) => (
-                  <option key={category.id_categoria} value={category.id_categoria}>
-                    {category.nome}
-                  </option>
-                ))}
-              </select>
+                ariaLabel="Categoria da meta"
+                placeholder="Sem categoria"
+                onChange={(id_categoria) => onGoalFormChange({ ...goalForm, id_categoria })}
+                options={[
+                  { value: '', label: 'Sem categoria' },
+                  ...categories.map((category) => ({
+                    value: String(category.id_categoria),
+                    label: category.nome,
+                  })),
+                ]}
+              />
             </Field>
           </div>
 

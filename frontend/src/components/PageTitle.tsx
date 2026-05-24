@@ -10,11 +10,15 @@ export function PageTitle({ activeView, user }: { activeView: View; user: User |
   } satisfies Record<View, [string, string]>
 
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div>
+    <div className="flex min-w-0 flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0 max-w-full">
         <p className="text-sm font-extrabold uppercase tracking-wide text-emerald-700">Saldoo</p>
-        <h1 className="mt-1 text-3xl font-black text-slate-950">{labels[activeView][0]}</h1>
-        <p className="mt-1 text-sm font-medium text-slate-500">{labels[activeView][1]}</p>
+        <h1 className="mt-1 break-words text-3xl font-black text-slate-950">
+          {labels[activeView][0]}
+        </h1>
+        <p className="mt-1 break-words text-sm font-medium text-slate-500">
+          {labels[activeView][1]}
+        </p>
       </div>
     </div>
   )

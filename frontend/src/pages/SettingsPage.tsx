@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react'
 import { Loader2, Plus, ShieldCheck, Trash2, UserRound } from 'lucide-react'
+import { SelectInput } from '../components/form/SelectInput'
 import { Button, EmptyState, Field, Panel } from '../components/ui'
 import { inputClass } from '../styles/tokens'
 import type {
@@ -41,7 +42,7 @@ export function SettingsPage({
   const customCategories = categories.filter((category) => category.id_usuario !== null)
 
   return (
-    <section className="grid gap-5 xl:grid-cols-2">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-2">
       <Panel title="Perfil">
         <form onSubmit={onProfileSubmit} className="grid gap-4">
           <Field label="Nome">
@@ -65,19 +66,20 @@ export function SettingsPage({
             />
           </Field>
           <Field label="Tipo de conta">
-            <select
+            <SelectInput
               value={profileForm.tipo_usuario}
-              onChange={(event) =>
+              ariaLabel="Tipo de conta"
+              onChange={(tipo_usuario) =>
                 onProfileFormChange({
                   ...profileForm,
-                  tipo_usuario: event.target.value as User['tipo_usuario'],
+                  tipo_usuario: tipo_usuario as User['tipo_usuario'],
                 })
               }
-              className={inputClass}
-            >
-              <option value="personal">Pessoa fisica</option>
-              <option value="business">Negocio</option>
-            </select>
+              options={[
+                { value: 'personal', label: 'Pessoa fisica' },
+                { value: 'business', label: 'Negocio' },
+              ]}
+            />
           </Field>
           <Button type="submit" disabled={saving === 'profile'}>
             {saving === 'profile' ? (
@@ -141,20 +143,21 @@ export function SettingsPage({
             />
           </Field>
           <Field label="Tipo">
-            <select
+            <SelectInput
               value={categoryForm.tipo}
-              onChange={(event) =>
+              ariaLabel="Tipo da categoria"
+              onChange={(tipo) =>
                 onCategoryFormChange({
                   ...categoryForm,
-                  tipo: event.target.value as Category['tipo'],
+                  tipo: tipo as Category['tipo'],
                 })
               }
-              className={inputClass}
-            >
-              <option value="expense">Despesa</option>
-              <option value="income">Receita</option>
-              <option value="both">Ambos</option>
-            </select>
+              options={[
+                { value: 'expense', label: 'Despesa' },
+                { value: 'income', label: 'Receita' },
+                { value: 'both', label: 'Ambos' },
+              ]}
+            />
           </Field>
           <Button type="submit" disabled={saving === 'category'}>
             {saving === 'category' ? (

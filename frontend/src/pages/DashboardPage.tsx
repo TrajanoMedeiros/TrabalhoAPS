@@ -23,8 +23,11 @@ export function DashboardPage({
   onTransactionDelete: (transaction: TransactionWithKind) => void
 }) {
   return (
-    <div className="grid gap-5">
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumo financeiro">
+    <div className="grid min-w-0 gap-5">
+      <section
+        className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Resumo financeiro"
+      >
         <MetricCard
           label="Saldo"
           value={formatMoney(dashboard?.saldo_atual ?? 0)}
@@ -51,7 +54,7 @@ export function DashboardPage({
         />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
+      <section className="grid min-w-0 gap-5 xl:grid-cols-[1.35fr_0.65fr]">
         <Panel title="Historico mensal">
           <HistoryChart history={history} />
         </Panel>
@@ -80,7 +83,7 @@ export function DashboardPage({
         </Panel>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-3">
+      <section className="grid min-w-0 gap-5 xl:grid-cols-3">
         <Panel title="Gastos por categoria">
           <BarList items={dashboard?.distribuicao_gastos ?? []} tone="rose" />
         </Panel>

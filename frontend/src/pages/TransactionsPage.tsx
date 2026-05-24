@@ -1,5 +1,7 @@
 import type { FormEvent } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, Loader2, Plus } from 'lucide-react'
+import { DateInput } from '../components/form/DateInput'
+import { SelectInput } from '../components/form/SelectInput'
 import { TransactionList } from '../components/finance/TransactionList'
 import { Button, Field, Panel } from '../components/ui'
 import { inputClass } from '../styles/tokens'
@@ -23,10 +25,10 @@ export function TransactionsPage({
   onDelete: (transaction: TransactionWithKind) => void
 }) {
   return (
-    <section className="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-[0.78fr_1.22fr]">
       <Panel title="Novo lancamento">
         <form onSubmit={onSubmit} className="grid gap-4">
-          <div className="grid grid-cols-2 rounded-lg bg-slate-100 p-1">
+          <div className="grid min-w-0 grid-cols-2 rounded-lg bg-slate-100 p-1">
             <TransactionTypeButton
               active={transactionForm.kind === 'expense'}
               label="Despesa"
@@ -61,34 +63,31 @@ export function TransactionsPage({
               />
             </Field>
             <Field label="Data">
-              <input
+              <DateInput
                 required
-                type="date"
                 value={transactionForm.data}
-                onChange={(event) =>
-                  onTransactionFormChange({ ...transactionForm, data: event.target.value })
-                }
-                className={inputClass}
+                ariaLabel="Data do lancamento"
+                onChange={(data) => onTransactionFormChange({ ...transactionForm, data })}
               />
             </Field>
           </div>
 
           <Field label="Categoria">
-            <select
-              required
+            <SelectInput
               value={transactionForm.id_categoria}
-              onChange={(event) =>
-                onTransactionFormChange({ ...transactionForm, id_categoria: event.target.value })
+              ariaLabel="Categoria do lancamento"
+              placeholder="Selecione"
+              onChange={(id_categoria) =>
+                onTransactionFormChange({ ...transactionForm, id_categoria })
               }
-              className={inputClass}
-            >
-              <option value="">Selecione</option>
-              {categories.map((category) => (
-                <option key={category.id_categoria} value={category.id_categoria}>
-                  {category.nome}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: 'Selecione' },
+                ...categories.map((category) => ({
+                  value: String(category.id_categoria),
+                  label: category.nome,
+                })),
+              ]}
+            />
           </Field>
 
           <Field label="Descricao">
@@ -139,7 +138,7 @@ function TransactionTypeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-extrabold transition ${
+      className={`inline-flex min-w-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-extrabold transition ${
         active ? activeClass : 'text-slate-500'
       }`}
     >

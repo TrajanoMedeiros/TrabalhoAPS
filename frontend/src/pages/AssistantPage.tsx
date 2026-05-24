@@ -44,8 +44,8 @@ export function AssistantPage({
   }, [messages, saving])
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-[1fr_360px]">
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-white px-5 py-5">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#22c55e] text-white">
@@ -116,7 +116,7 @@ export function AssistantPage({
         </div>
       </div>
 
-      <aside className="grid gap-4 content-start">
+      <aside className="grid min-w-0 content-start gap-4">
         <ContextCard
           icon={WalletCards}
           label="Saldo do periodo"
