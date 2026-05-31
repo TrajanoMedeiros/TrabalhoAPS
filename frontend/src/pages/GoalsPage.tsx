@@ -245,12 +245,17 @@ function GoalCard({
           style={{ width: `${goal.progresso_percentual}%` }}
         />
       </div>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+      <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
         <p className="text-sm font-extrabold text-emerald-700">
           {goal.progresso_percentual.toFixed(1)}% concluida
         </p>
-        <div className="flex gap-2">
-          <Button variant="ghost" onClick={() => onEdit(goal)} disabled={saving === 'goal'}>
+        <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
+          <Button
+            variant="ghost"
+            onClick={() => onEdit(goal)}
+            disabled={saving === 'goal'}
+            className="min-h-10 px-3"
+          >
             <Pencil className="h-4 w-4" aria-hidden="true" />
             Editar
           </Button>
@@ -258,11 +263,17 @@ function GoalCard({
             variant="ghost"
             onClick={() => void onProgress(goal)}
             disabled={saving === 'goal-progress' || goal.progresso_percentual >= 100}
+            className="min-h-10 px-3"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             10%
           </Button>
-          <Button variant="danger" onClick={() => onDelete(goal)} disabled={saving === 'delete'}>
+          <Button
+            variant="danger"
+            onClick={() => onDelete(goal)}
+            disabled={saving === 'delete'}
+            className="min-h-10 px-3"
+          >
             <Trash2 className="h-4 w-4" aria-hidden="true" />
             Remover
           </Button>

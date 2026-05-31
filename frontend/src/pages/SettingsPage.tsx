@@ -219,7 +219,7 @@ export function SettingsPage({
             {filteredCategories.map((category) => (
               <div
                 key={category.id_categoria}
-                className={`flex items-center justify-between gap-3 border-b pb-3 last:border-0 ${
+                className={`flex flex-wrap items-start justify-between gap-3 border-b pb-3 last:border-0 ${
                   editingCategory?.id_categoria === category.id_categoria
                     ? 'rounded-2xl border-amber-200 bg-amber-50/40 p-3'
                     : 'border-slate-100'
@@ -229,11 +229,12 @@ export function SettingsPage({
                   <p className="font-black text-slate-950">{category.nome}</p>
                   <p className="text-sm font-bold text-slate-500">{category.tipo}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
                   <Button
                     variant="ghost"
                     onClick={() => onCategoryEdit(category)}
                     disabled={saving === 'category'}
+                    className="min-h-10 px-3"
                   >
                     <Pencil className="h-4 w-4" aria-hidden="true" />
                     Editar
@@ -242,6 +243,7 @@ export function SettingsPage({
                     variant="danger"
                     onClick={() => onCategoryDelete(category)}
                     disabled={saving === 'delete'}
+                    className="min-h-10 px-3"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                     Remover

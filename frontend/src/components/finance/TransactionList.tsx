@@ -33,7 +33,7 @@ export function TransactionList({
         return (
           <article
             key={`${transaction.kind}-${transaction.id}`}
-            className="flex items-center justify-between gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50"
+            className="grid gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50 sm:flex sm:items-center sm:justify-between"
           >
             <div className="flex min-w-0 items-center gap-3">
                   <div
@@ -56,9 +56,9 @@ export function TransactionList({
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
               <p
-                className={`text-right font-black ${
+                className={`text-sm font-black sm:text-right ${
                   isIncome ? 'text-emerald-700' : 'text-rose-700'
                 }`}
               >
@@ -66,13 +66,13 @@ export function TransactionList({
                 {formatMoney(transaction.valor)}
               </p>
               {!compact && (
-                <>
+                <div className="flex shrink-0 items-center gap-2">
                   {onEdit && (
                     <Button
                       variant="ghost"
                       onClick={() => onEdit(transaction)}
                       disabled={saving === 'transaction'}
-                      className="min-h-10 px-3"
+                      className="min-h-10 w-11 px-0"
                     >
                       <Pencil className="h-4 w-4" aria-hidden="true" />
                       <span className="sr-only">Editar</span>
@@ -82,12 +82,12 @@ export function TransactionList({
                     variant="danger"
                     onClick={() => onDelete(transaction)}
                     disabled={saving === 'delete'}
-                    className="min-h-10 px-3"
+                    className="min-h-10 w-11 px-0"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                     <span className="sr-only">Remover</span>
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </article>
