@@ -133,15 +133,15 @@ class FinancialApiTest extends TestCase
         $this->seed();
 
         $adminToken = $this->postJson('/api/auth/login', [
-            'email' => 'admin@saldoo.local',
-            'senha' => 'Admin@123456',
+            'email' => 'admin@saldoo.com',
+            'senha' => 'Admin@2026',
         ])->assertOk()
             ->assertJsonPath('data.user.papel', 'admin')
             ->json('data.token');
 
         $userToken = $this->postJson('/api/auth/login', [
-            'email' => 'usuario@saldoo.local',
-            'senha' => 'Usuario@123456',
+            'email' => 'carlos.silva@saldoo.com',
+            'senha' => 'User@2026',
         ])->assertOk()
             ->assertJsonPath('data.user.papel', 'user')
             ->json('data.token');
@@ -169,7 +169,7 @@ class FinancialApiTest extends TestCase
     {
         $this->seed();
 
-        $user = User::query()->where('email', 'usuario@saldoo.local')->firstOrFail();
+        $user = User::query()->where('email', 'carlos.silva@saldoo.com')->firstOrFail();
         $firstIncome = Income::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
         $firstExpense = Expense::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
         $lastIncome = Income::query()->where('user_id', $user->id)->latest('occurred_on')->first();

@@ -137,8 +137,8 @@ Ao executar `php artisan migrate --seed` ou `npm run dev`, o banco cria usuarios
 
 | Papel | Email | Senha |
 | --- | --- | --- |
-| Administrador | `admin@saldoo.local` | `Admin@123456` |
-| Usuario comum | `usuario@saldoo.local` | `Usuario@123456` |
+| Administrador Saldoo | `admin@saldoo.com` | `Admin@2026` |
+| Carlos Henrique Silva | `carlos.silva@saldoo.com` | `User@2026` |
 
 O administrador acessa `/api/admin/overview`. Usuarios comuns recebem `403` nessa rota.
 

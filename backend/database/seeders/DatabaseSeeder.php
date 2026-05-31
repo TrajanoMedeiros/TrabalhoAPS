@@ -39,20 +39,20 @@ class DatabaseSeeder extends Seeder
         ]));
 
         User::query()->updateOrCreate(
-            ['email' => 'admin@saldoo.local'],
+            ['email' => 'admin@saldoo.com'],
             [
-                'name' => 'Admin Saldoo',
-                'password' => 'Admin@123456',
+                'name' => 'Administrador Saldoo',
+                'password' => 'Admin@2026',
                 'account_type' => 'business',
                 'role' => User::ROLE_ADMIN,
             ],
         );
 
         $demoUser = User::query()->updateOrCreate(
-            ['email' => 'usuario@saldoo.local'],
+            ['email' => 'carlos.silva@saldoo.com'],
             [
-                'name' => 'Usuario Saldoo',
-                'password' => 'Usuario@123456',
+                'name' => 'Carlos Henrique Silva',
+                'password' => 'User@2026',
                 'account_type' => 'personal',
                 'role' => User::ROLE_USER,
             ],

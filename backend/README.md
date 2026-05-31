@@ -63,8 +63,8 @@ Authorization: Bearer <token>
 Usuarios seedados:
 
 ```text
-admin@saldoo.local / Admin@123456
-usuario@saldoo.local / Usuario@123456
+Administrador Saldoo: admin@saldoo.com / Admin@2026
+Carlos Henrique Silva: carlos.silva@saldoo.com / User@2026
 ```
 
 ## Padroes Da API
