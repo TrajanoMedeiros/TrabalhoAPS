@@ -72,5 +72,9 @@ export function Panel({
 }
 
 export function EmptyState({ children }: { children: ReactNode }) {
-  return <p className="text-slate-500">{children}</p>
+  return (
+    <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-sm font-medium leading-6 text-slate-500">
+      {children}
+    </p>
+  )
 }

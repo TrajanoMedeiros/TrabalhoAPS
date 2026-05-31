@@ -17,7 +17,13 @@ export function TransactionList({
   compact?: boolean
 }) {
   if (transactions.length === 0) {
-    return <EmptyState>Nenhum lancamento no periodo.</EmptyState>
+    return (
+      <EmptyState>
+        {compact
+          ? 'Sem lancamentos recentes. Adicione receitas e despesas para preencher este painel.'
+          : 'Nenhum lancamento no periodo. Registre um novo item para iniciar sua analise financeira.'}
+      </EmptyState>
+    )
   }
 
   return (

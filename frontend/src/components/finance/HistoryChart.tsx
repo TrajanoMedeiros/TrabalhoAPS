@@ -4,7 +4,12 @@ import { formatMoney, monthName } from '../../utils/format'
 
 export function HistoryChart({ history }: { history: HistoryItem[] }) {
   if (history.length === 0) {
-    return <EmptyState>Sem historico suficiente para o grafico.</EmptyState>
+    return (
+      <EmptyState>
+        Sem historico suficiente para o grafico. Continue registrando movimentacoes para acompanhar
+        tendencias mensais.
+      </EmptyState>
+    )
   }
 
   const maxValue = Math.max(

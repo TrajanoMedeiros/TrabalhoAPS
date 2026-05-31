@@ -9,7 +9,12 @@ export function BarList({
   tone: 'emerald' | 'rose'
 }) {
   if (items.length === 0) {
-    return <EmptyState>Sem dados para este periodo.</EmptyState>
+    return (
+      <EmptyState>
+        Sem dados para este periodo. Registre novos lancamentos para revelar a distribuicao por
+        categoria.
+      </EmptyState>
+    )
   }
 
   const maxValue = Math.max(1, ...items.map((item) => item.total))

@@ -22,6 +22,9 @@ export function DashboardPage({
   saving: SavingAction
   onTransactionDelete: (transaction: TransactionWithKind) => void
 }) {
+  const topExpense = dashboard?.distribuicao_gastos[0]
+  const topIncome = dashboard?.distribuicao_receitas[0]
+
   return (
     <div className="grid min-w-0 gap-5">
       <section
@@ -51,6 +54,37 @@ export function DashboardPage({
           value={`${Number(dashboard?.taxa_economia ?? 0).toFixed(1)}%`}
           icon={CircleDollarSign}
           tone="amber"
+        />
+      </section>
+
+      <section className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <QuickInsightCard
+          question="Como estou financeiramente?"
+          answer={`Saldo atual de ${formatMoney(dashboard?.saldo_atual ?? 0)}.`}
+        />
+        <QuickInsightCard
+          question="O que mudou?"
+          answer={
+            dashboard
+              ? `${Number(dashboard.taxa_economia).toFixed(1)}% de economia no periodo atual.`
+              : 'Registre movimentacoes para calcular variacao do periodo.'
+          }
+        />
+        <QuickInsightCard
+          question="Onde estou gastando mais?"
+          answer={
+            topExpense
+              ? `${topExpense.categoria}: ${formatMoney(topExpense.total)}.`
+              : 'Ainda sem gastos suficientes para identificar principal categoria.'
+          }
+        />
+        <QuickInsightCard
+          question="Minhas metas estao evoluindo?"
+          answer={
+            dashboard?.metas.total
+              ? `${dashboard.metas.progresso_percentual.toFixed(1)}% de progresso agregado em ${dashboard.metas.total} metas.`
+              : 'Nenhuma meta ativa no momento. Crie sua primeira meta em Metas.'
+          }
         />
       </section>
 
@@ -99,6 +133,48 @@ export function DashboardPage({
           />
         </Panel>
       </section>
+
+      {(topIncome || topExpense) && (
+        <section className="grid min-w-0 gap-4 lg:grid-cols-2">
+          <Panel title="Leitura rapida de categorias">
+            <div className="grid gap-3 text-sm text-slate-600">
+              <p>
+                <span className="font-extrabold text-slate-900">Maior receita:</span>{' '}
+                {topIncome
+                  ? `${topIncome.categoria} (${formatMoney(topIncome.total)})`
+                  : 'Sem dados no periodo.'}
+              </p>
+              <p>
+                <span className="font-extrabold text-slate-900">Maior despesa:</span>{' '}
+                {topExpense
+                  ? `${topExpense.categoria} (${formatMoney(topExpense.total)})`
+                  : 'Sem dados no periodo.'}
+              </p>
+            </div>
+          </Panel>
+          <Panel title="Proximo melhor passo">
+            <p className="text-sm leading-6 text-slate-600">
+              {score?.recomendacoes[0] ??
+                'Continue registrando receitas, despesas e metas para liberar recomendacoes personalizadas.'}
+            </p>
+          </Panel>
+        </section>
+      )}
     </div>
+  )
+}
+
+function QuickInsightCard({
+  question,
+  answer,
+}: {
+  question: string
+  answer: string
+}) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-xs font-extrabold uppercase tracking-wide text-slate-400">{question}</p>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">{answer}</p>
+    </article>
   )
 }
