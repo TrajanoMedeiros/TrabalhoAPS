@@ -12,7 +12,7 @@ import {
 import { Button } from '../components/ui'
 import { inputClass } from '../styles/tokens'
 import type { ChatMessage, Dashboard, SavingAction, Score } from '../types'
-import { formatMoney } from '../utils/format'
+import { formatMoney, formatTime } from '../utils/format'
 
 const suggestions = [
   'Como posso economizar este mes?',
@@ -162,7 +162,14 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             : 'rounded-tl-md border border-emerald-100 bg-white text-slate-700'
         }`}
       >
-        {message.content}
+        <p>{message.content}</p>
+        <p
+          className={`mt-2 text-[11px] font-bold ${
+            isUser ? 'text-slate-300' : 'text-slate-400'
+          }`}
+        >
+          {formatTime(message.createdAt)}
+        </p>
       </div>
     </div>
   )

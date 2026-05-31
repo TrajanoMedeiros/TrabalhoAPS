@@ -56,5 +56,6 @@ export const initialChatMessages: ChatMessage[] = [
   {
     role: 'assistant',
     content: 'Me conte sua duvida financeira e eu respondo usando seus dados do Saldoo.',
+    createdAt: new Date().toISOString(),
   },
 ]

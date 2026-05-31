@@ -26,12 +26,13 @@ export function useAssistantActions({
     event.preventDefault()
     const message = chatInput.trim()
     if (!message) return
+    const createdAt = new Date().toISOString()
 
     setSaving('chat')
     setError(null)
     setNotice(null)
     setChatInput('')
-    setChatMessages((current) => [...current, { role: 'user', content: message }])
+    setChatMessages((current) => [...current, { role: 'user', content: message, createdAt }])
 
     try {
       const payload = await request<ChatPayload>('/api/chat', {
@@ -40,9 +41,22 @@ export function useAssistantActions({
       })
       setChatMessages((current) => [
         ...current,
-        { role: 'assistant', content: payload.chat.resposta },
+        {
+          role: 'assistant',
+          content: payload.chat.resposta,
+          createdAt: new Date().toISOString(),
+        },
       ])
     } catch (chatError) {
+      setChatMessages((current) => [
+        ...current,
+        {
+          role: 'assistant',
+          content:
+            'Tive uma instabilidade agora. Tente novamente em instantes que continuo te ajudando.',
+          createdAt: new Date().toISOString(),
+        },
+      ])
       setError(getErrorMessage(chatError, 'Nao foi possivel responder agora.'))
     } finally {
       setSaving(null)

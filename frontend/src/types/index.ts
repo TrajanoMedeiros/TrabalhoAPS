@@ -101,6 +101,7 @@ export type AuthPayload = {
 export type ChatMessage = {
   role: 'user' | 'assistant'
   content: string
+  createdAt: string
 }
 
 export type ChatPayload = {
@@ -112,6 +113,7 @@ export type ChatPayload = {
       total_despesas: number
       score: number
       nivel: string
+      [key: string]: unknown
     }
   }
 }
