@@ -150,7 +150,7 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-[#f6f7f2] text-slate-950">
       <aside
-        className={`fixed inset-y-0 left-0 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 lg:flex ${
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 lg:flex ${
           sidebarCollapsed ? 'w-20' : 'w-64'
         }`}
       >
@@ -202,7 +202,7 @@ export function AppShell({
         />
       )}
 
-      <div className={`relative transition-[padding] duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+      <div className={`relative z-0 transition-[padding] duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         <header
           className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out lg:translate-y-0 ${
             mobileHeaderHidden ? '-translate-y-full' : 'translate-y-0'
