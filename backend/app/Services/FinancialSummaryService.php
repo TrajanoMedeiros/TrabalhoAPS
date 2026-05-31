@@ -91,7 +91,9 @@ class FinancialSummaryService
             ->latest('occurred_on')
             ->limit(5)
             ->get()
-            ->map(fn (Income $income): array => TransactionResource::make($income, 'income'));
+            ->map(fn (Income $income): array => TransactionResource::make($income, 'income'))
+            ->values()
+            ->all();
 
         $expenses = Expense::query()
             ->with('category')
@@ -99,11 +101,12 @@ class FinancialSummaryService
             ->latest('occurred_on')
             ->limit(5)
             ->get()
-            ->map(fn (Expense $expense): array => TransactionResource::make($expense, 'expense'));
+            ->map(fn (Expense $expense): array => TransactionResource::make($expense, 'expense'))
+            ->values()
+            ->all();
 
-        return $incomes
-            ->merge($expenses)
-            ->sortByDesc(fn (array $transaction): string => $transaction['data'].$transaction['created_at'])
+        return collect(array_merge($incomes, $expenses))
+            ->sortByDesc(fn (array $transaction): string => ($transaction['data'] ?? '').($transaction['created_at'] ?? ''))
             ->take(10)
             ->values()
             ->all();
