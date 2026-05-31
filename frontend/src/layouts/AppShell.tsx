@@ -95,6 +95,24 @@ export function AppShell({
     return () => window.removeEventListener('scroll', handleScroll)
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false)
+    }
+
+    document.addEventListener('keydown', closeOnEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [mobileMenuOpen])
+
   function handleMobileViewChange(view: View) {
     onViewChange(view)
     setMobileMenuOpen(false)
@@ -125,7 +143,16 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="lg:pl-64">
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Fechar menu"
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-20 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+        />
+      )}
+
+      <div className="relative lg:pl-64">
         <header
           className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out lg:translate-y-0 ${
             mobileHeaderHidden ? '-translate-y-full' : 'translate-y-0'
