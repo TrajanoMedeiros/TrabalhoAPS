@@ -91,8 +91,13 @@ function App() {
           chatInput={app.chatInput}
           dashboard={app.dashboard}
           score={app.score}
+          welcomeMessage={app.assistantWelcomeMessage}
+          suggestions={app.assistantSuggestions}
           saving={app.saving}
           onChatInputChange={app.setChatInput}
+          onClearConversation={app.clearChatConversation}
+          onRestartConversation={() => app.restartChatConversation(true)}
+          onStartConversation={() => app.restartChatConversation(false)}
           onSubmit={app.handleChatSubmit}
         />
       )}

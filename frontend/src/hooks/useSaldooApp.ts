@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  buildAssistantSuggestions,
+  buildAssistantWelcomeMessage,
+  createChatMessage,
+} from '../modules/assistant/chatExperience'
 import { useAssistantActions } from '../modules/assistant/useAssistantActions'
 import { useAuthFlow } from '../modules/auth/useAuthFlow'
 import {
@@ -77,6 +82,14 @@ export function useSaldooApp() {
   )
   const expenseCategories = useMemo(() => filterExpenseCategories(categories), [categories])
   const transactions = useMemo(() => mergeTransactions(incomes, expenses), [expenses, incomes])
+  const assistantWelcomeMessage = useMemo(
+    () => buildAssistantWelcomeMessage({ dashboard, score }),
+    [dashboard, score],
+  )
+  const assistantSuggestions = useMemo(
+    () => buildAssistantSuggestions({ dashboard, score }),
+    [dashboard, score],
+  )
 
   const request = useCallback(
     async <T,>(path: string, options: RequestInit = {}) => api<T>(path, options, token),
@@ -219,6 +232,42 @@ export function useSaldooApp() {
     setCategoryForm(initialCategoryForm)
   }, [])
 
+  const restartChatConversation = useCallback(
+    (withConfirmation = false) => {
+      if (
+        withConfirmation &&
+        chatMessages.length > 1 &&
+        !window.confirm('Deseja reiniciar a conversa? O historico atual sera substituido.')
+      ) {
+        return
+      }
+
+      setChatInput('')
+      setChatMessages([
+        createChatMessage('assistant', assistantWelcomeMessage),
+      ])
+      setNotice('Conversa reiniciada.')
+      setError(null)
+    },
+    [assistantWelcomeMessage, chatMessages.length],
+  )
+
+  const clearChatConversation = useCallback(() => {
+    if (chatMessages.length === 0) return
+    if (
+      !window.confirm(
+        'Limpar toda a conversa agora? Esta acao remove o historico desta sessao.',
+      )
+    ) {
+      return
+    }
+
+    setChatInput('')
+    setChatMessages([])
+    setNotice('Conversa limpa. Quando quiser, inicie um novo dialogo.')
+    setError(null)
+  }, [chatMessages.length])
+
   const { handleAuth } = useAuthFlow({
     authMode,
     authForm,
@@ -275,7 +324,9 @@ export function useSaldooApp() {
   })
   const { handleChatSubmit } = useAssistantActions({
     chatInput,
+    dashboard,
     request,
+    score,
     setChatInput,
     setChatMessages,
     setError,
@@ -293,6 +344,7 @@ export function useSaldooApp() {
     chatInput,
     chatMessages,
     cancelCategoryEdit,
+    clearChatConversation,
     cancelGoalEdit,
     cancelTransactionEdit,
     dashboard,
@@ -335,9 +387,12 @@ export function useSaldooApp() {
     setProfileForm,
     setTransactionForm,
     setYear,
+    restartChatConversation,
     startCategoryEdit,
     startGoalEdit,
     startTransactionEdit,
+    assistantSuggestions,
+    assistantWelcomeMessage,
     token,
     transactionCategories,
     transactionForm,

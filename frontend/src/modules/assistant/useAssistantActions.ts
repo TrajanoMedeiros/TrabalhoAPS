@@ -1,11 +1,14 @@
 import type { FormEvent } from 'react'
 import { getErrorMessage } from '../../services/error'
-import type { ChatMessage, ChatPayload, SavingAction } from '../../types'
+import { buildLocalAssistantReply, createChatMessage } from './chatExperience'
+import type { ChatMessage, ChatPayload, Dashboard, SavingAction, Score } from '../../types'
 import type { ApiRequest, Setter } from '../shared'
 
 type AssistantActionDependencies = {
   chatInput: string
+  dashboard: Dashboard | null
   request: ApiRequest
+  score: Score | null
   setChatInput: Setter<string>
   setChatMessages: Setter<ChatMessage[]>
   setError: Setter<string | null>
@@ -15,7 +18,9 @@ type AssistantActionDependencies = {
 
 export function useAssistantActions({
   chatInput,
+  dashboard,
   request,
+  score,
   setChatInput,
   setChatMessages,
   setError,
@@ -26,38 +31,29 @@ export function useAssistantActions({
     event.preventDefault()
     const message = chatInput.trim()
     if (!message) return
-    const createdAt = new Date().toISOString()
 
     setSaving('chat')
     setError(null)
     setNotice(null)
     setChatInput('')
-    setChatMessages((current) => [...current, { role: 'user', content: message, createdAt }])
+    setChatMessages((current) => [...current, createChatMessage('user', message)])
 
     try {
       const payload = await request<ChatPayload>('/api/chat', {
         method: 'POST',
         body: JSON.stringify({ mensagem: message }),
       })
-      setChatMessages((current) => [
-        ...current,
-        {
-          role: 'assistant',
-          content: payload.chat.resposta,
-          createdAt: new Date().toISOString(),
-        },
-      ])
+      setChatMessages((current) => [...current, createChatMessage('assistant', payload.chat.resposta)])
     } catch (chatError) {
+      const fallbackResponse = buildLocalAssistantReply(message, { dashboard, score })
       setChatMessages((current) => [
         ...current,
-        {
-          role: 'assistant',
-          content:
-            'Tive uma instabilidade agora. Tente novamente em instantes que continuo te ajudando.',
-          createdAt: new Date().toISOString(),
-        },
+        createChatMessage('assistant', fallbackResponse),
       ])
-      setError(getErrorMessage(chatError, 'Nao foi possivel responder agora.'))
+      setNotice('Instabilidade na API detectada. Continuei com analise local inteligente.')
+      if (!dashboard || !score) {
+        setError(getErrorMessage(chatError, 'Nao foi possivel responder agora.'))
+      }
     } finally {
       setSaving(null)
     }

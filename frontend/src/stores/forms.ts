@@ -55,7 +55,8 @@ export const initialPasswordForm: PasswordForm = {
 export const initialChatMessages: ChatMessage[] = [
   {
     role: 'assistant',
-    content: 'Me conte sua duvida financeira e eu respondo usando seus dados do Saldoo.',
+    content:
+      'Ola, sou seu assistente financeiro. Posso ajudar voce a entender seus gastos, metas, categorias e indicadores financeiros.',
     createdAt: new Date().toISOString(),
   },
 ]

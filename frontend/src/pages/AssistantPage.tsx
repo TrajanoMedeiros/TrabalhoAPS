@@ -1,11 +1,14 @@
-import { type FormEvent, useEffect, useRef } from 'react'
+import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bot,
+  ChevronsDown,
   Loader2,
   MessageSquareText,
+  RotateCcw,
   SendHorizonal,
   Sparkles,
   Target,
+  Trash2,
   TrendingUp,
   WalletCards,
 } from 'lucide-react'
@@ -14,63 +17,161 @@ import { inputClass } from '../styles/tokens'
 import type { ChatMessage, Dashboard, SavingAction, Score } from '../types'
 import { formatMoney, formatTime } from '../utils/format'
 
-const suggestions = [
-  'Como posso economizar este mes?',
-  'Explique meu score financeiro',
-  'Qual prioridade para minhas metas?',
-]
+const groupWindowInMs = 6 * 60 * 1000
 
 export function AssistantPage({
   messages,
   chatInput,
   dashboard,
   score,
+  welcomeMessage,
+  suggestions,
   saving,
   onChatInputChange,
+  onClearConversation,
+  onRestartConversation,
+  onStartConversation,
   onSubmit,
 }: {
   messages: ChatMessage[]
   chatInput: string
   dashboard: Dashboard | null
   score: Score | null
+  welcomeMessage: string
+  suggestions: string[]
   saving: SavingAction
   onChatInputChange: (value: string) => void
+  onClearConversation: () => void
+  onRestartConversation: () => void
+  onStartConversation: () => void
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const messageCountRef = useRef(messages.length)
+  const [isAtBottom, setIsAtBottom] = useState(true)
+  const [showJumpToLatest, setShowJumpToLatest] = useState(false)
+  const activeSuggestions = useMemo(
+    () => (suggestions.length > 0 ? suggestions : ['Me de um resumo financeiro rapido.']),
+    [suggestions],
+  )
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, saving])
+    const container = scrollRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const distance = container.scrollHeight - container.scrollTop - container.clientHeight
+      const nearBottom = distance < 72
+
+      setIsAtBottom(nearBottom)
+      if (nearBottom) setShowJumpToLatest(false)
+    }
+
+    handleScroll()
+    container.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const container = scrollRef.current
+    if (!container) return
+
+    const previousCount = messageCountRef.current
+    const hasNewMessages = messages.length > previousCount || saving === 'chat'
+
+    if (hasNewMessages && isAtBottom) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+      setShowJumpToLatest(false)
+    } else if (messages.length > previousCount) {
+      setShowJumpToLatest(true)
+    }
+
+    messageCountRef.current = messages.length
+  }, [isAtBottom, messages, saving])
+
+  function scrollToLatest() {
+    const container = scrollRef.current
+    if (!container) return
+
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+    setShowJumpToLatest(false)
+  }
 
   return (
     <section className="grid min-w-0 gap-5 xl:grid-cols-[1fr_360px]">
       <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-white px-5 py-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#22c55e] text-white">
-              <Bot className="h-6 w-6" aria-hidden="true" />
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#22c55e] text-white">
+                <Bot className="h-6 w-6" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-950">Assistente Saldoo</h2>
+                <p className="text-sm font-medium text-slate-500">
+                  Insights financeiros com base nos seus dados
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-black text-slate-950">Assistente Saldoo</h2>
-              <p className="text-sm font-medium text-slate-500">
-                Insights financeiros com base nos seus dados
-              </p>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="ghost"
+                onClick={onRestartConversation}
+                className="min-h-10 px-3 text-sm"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                Reiniciar
+              </Button>
+              <Button
+                variant="danger"
+                onClick={onClearConversation}
+                className="min-h-10 px-3 text-sm"
+                disabled={messages.length === 0}
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                Limpar conversa
+              </Button>
             </div>
           </div>
         </div>
 
         <div
           ref={scrollRef}
-          className="grid max-h-[56vh] min-h-[420px] gap-4 overflow-y-auto bg-[#fbfcf8] px-5 py-5"
+          className="relative grid max-h-[56vh] min-h-[420px] content-start gap-3 overflow-y-auto bg-[#fbfcf8] px-5 py-5"
           aria-live="polite"
         >
-          {messages.map((message, index) => (
-            <MessageBubble key={`${message.role}-${index}`} message={message} />
-          ))}
+          {messages.length === 0 ? (
+            <EmptyConversationState
+              welcomeMessage={welcomeMessage}
+              suggestions={activeSuggestions}
+              onStartConversation={onStartConversation}
+              onSuggestionSelect={onChatInputChange}
+            />
+          ) : (
+            messages.map((message, index) => {
+              const previous = messages[index - 1]
+              const next = messages[index + 1]
+              const startsGroup = !previous || !isGroupedMessage(previous, message)
+              const endsGroup = !next || !isGroupedMessage(message, next)
+              const startsDay = !previous || !isSameDay(previous.createdAt, message.createdAt)
+
+              return (
+                <div key={`${message.role}-${message.createdAt}-${index}`}>
+                  {startsDay && <DayDivider value={message.createdAt} />}
+                  <MessageBubble
+                    message={message}
+                    startsGroup={startsGroup}
+                    endsGroup={endsGroup}
+                  />
+                </div>
+              )
+            })
+          )}
 
           {saving === 'chat' && (
-            <div className="flex max-w-[86%] items-start gap-3">
+            <div className="flex max-w-[90%] items-start gap-3">
               <AssistantAvatar />
               <div className="rounded-2xl rounded-tl-md border border-emerald-100 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm">
                 <span className="inline-flex items-center gap-2">
@@ -80,11 +181,22 @@ export function AssistantPage({
               </div>
             </div>
           )}
+
+          {showJumpToLatest && (
+            <button
+              type="button"
+              onClick={scrollToLatest}
+              className="sticky bottom-0 ml-auto inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-700 shadow-md transition hover:bg-slate-50"
+            >
+              <ChevronsDown className="h-4 w-4" aria-hidden="true" />
+              Ir para o fim
+            </button>
+          )}
         </div>
 
         <div className="border-t border-slate-100 bg-white px-5 py-4">
           <div className="mb-3 flex flex-wrap gap-2">
-            {suggestions.map((suggestion) => (
+            {activeSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
@@ -140,8 +252,8 @@ export function AssistantPage({
             <h3 className="font-black text-slate-950">Como o assistente ajuda</h3>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            Ele interpreta saldo, gastos, metas e score para sugerir proximos passos simples dentro
-            do Saldoo.
+            Ele interpreta saldo, gastos, metas e score para sugerir proximos passos objetivos e
+            aplicaveis no seu dia a dia.
           </p>
         </div>
       </aside>
@@ -149,28 +261,103 @@ export function AssistantPage({
   )
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({
+  message,
+  startsGroup,
+  endsGroup,
+}: {
+  message: ChatMessage
+  startsGroup: boolean
+  endsGroup: boolean
+}) {
   const isUser = message.role === 'user'
 
   return (
-    <div className={`flex items-start gap-3 ${isUser ? 'justify-end' : ''}`}>
-      {!isUser && <AssistantAvatar />}
+    <div className={`flex items-end gap-2 ${isUser ? 'justify-end' : ''}`}>
+      {!isUser && (
+        <div className={`transition ${startsGroup ? 'opacity-100' : 'opacity-0'}`}>
+          <AssistantAvatar />
+        </div>
+      )}
+
       <div
-        className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${
+        className={`max-w-[90%] px-4 py-3 text-sm leading-6 shadow-sm ${
           isUser
-            ? 'rounded-tr-md bg-slate-950 text-white'
-            : 'rounded-tl-md border border-emerald-100 bg-white text-slate-700'
+            ? `${startsGroup ? 'rounded-t-2xl rounded-l-2xl rounded-br-md' : 'rounded-2xl'} ${
+                endsGroup ? 'mb-1' : 'mb-0.5'
+              } bg-slate-950 text-white`
+            : `${startsGroup ? 'rounded-t-2xl rounded-r-2xl rounded-bl-md' : 'rounded-2xl'} ${
+                endsGroup ? 'mb-1' : 'mb-0.5'
+              } border border-emerald-100 bg-white text-slate-700`
         }`}
       >
         <p>{message.content}</p>
-        <p
-          className={`mt-2 text-[11px] font-bold ${
-            isUser ? 'text-slate-300' : 'text-slate-400'
-          }`}
-        >
-          {formatTime(message.createdAt)}
-        </p>
+        {endsGroup && (
+          <p
+            className={`mt-2 text-[11px] font-bold ${
+              isUser ? 'text-slate-300' : 'text-slate-400'
+            }`}
+          >
+            {formatTime(message.createdAt)}
+          </p>
+        )}
       </div>
+    </div>
+  )
+}
+
+function EmptyConversationState({
+  welcomeMessage,
+  suggestions,
+  onStartConversation,
+  onSuggestionSelect,
+}: {
+  welcomeMessage: string
+  suggestions: string[]
+  onStartConversation: () => void
+  onSuggestionSelect: (value: string) => void
+}) {
+  return (
+    <div className="grid gap-4 rounded-2xl border border-dashed border-emerald-200 bg-white/80 p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <AssistantAvatar />
+        <div>
+          <p className="text-sm font-black text-slate-950">Conversa pronta para comecar</p>
+          <p className="text-xs font-semibold text-slate-500">Onboarding inteligente da IA</p>
+        </div>
+      </div>
+
+      <p className="text-sm leading-6 text-slate-700">{welcomeMessage}</p>
+
+      <div className="flex flex-wrap gap-2">
+        {suggestions.slice(0, 3).map((suggestion) => (
+          <button
+            key={suggestion}
+            type="button"
+            onClick={() => onSuggestionSelect(suggestion)}
+            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+          >
+            {suggestion}
+          </button>
+        ))}
+      </div>
+
+      <Button type="button" variant="secondary" onClick={onStartConversation} className="min-h-11">
+        <RotateCcw className="h-4 w-4" aria-hidden="true" />
+        Reiniciar com boas-vindas
+      </Button>
+    </div>
+  )
+}
+
+function DayDivider({ value }: { value: string }) {
+  return (
+    <div className="my-2 flex items-center gap-3">
+      <div className="h-px flex-1 bg-slate-200" />
+      <span className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">
+        {formatConversationDay(value)}
+      </span>
+      <div className="h-px flex-1 bg-slate-200" />
     </div>
   )
 }
@@ -203,4 +390,32 @@ function ContextCard({
       <p className="mt-4 text-2xl font-black text-slate-950">{value}</p>
     </div>
   )
+}
+
+function isGroupedMessage(previous: ChatMessage, current: ChatMessage) {
+  if (previous.role !== current.role) return false
+
+  const previousTime = new Date(previous.createdAt).getTime()
+  const currentTime = new Date(current.createdAt).getTime()
+
+  return Math.abs(currentTime - previousTime) < groupWindowInMs
+}
+
+function isSameDay(previous: string, current: string) {
+  return new Date(previous).toDateString() === new Date(current).toDateString()
+}
+
+function formatConversationDay(value: string) {
+  const date = new Date(value)
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+
+  if (date.toDateString() === today.toDateString()) return 'Hoje'
+  if (date.toDateString() === yesterday.toDateString()) return 'Ontem'
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+  }).format(date)
 }
