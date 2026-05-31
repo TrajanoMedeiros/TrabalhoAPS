@@ -40,6 +40,10 @@ class FinancialApiTest extends TestCase
             'id_categoria' => $incomeCategory,
         ])->assertCreated()
             ->json('data.income');
+        $this->assertDatabaseHas('incomes', [
+            'id' => $income['id'],
+            'description' => 'Salario',
+        ]);
 
         $expense = $this->withToken($token)->postJson('/api/expenses', [
             'valor' => 860.50,
@@ -48,6 +52,20 @@ class FinancialApiTest extends TestCase
             'id_categoria' => $expenseCategory,
         ])->assertCreated()
             ->json('data.expense');
+        $this->assertDatabaseHas('expenses', [
+            'id' => $expense['id'],
+            'description' => 'Mercado',
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/incomes/'.$income['id'])
+            ->assertOk()
+            ->assertJsonPath('data.income.id', $income['id']);
+
+        $this->withToken($token)
+            ->getJson('/api/expenses/'.$expense['id'])
+            ->assertOk()
+            ->assertJsonPath('data.expense.id', $expense['id']);
 
         $this->withToken($token)->putJson('/api/incomes/'.$income['id'], [
             'valor' => 5300,
@@ -56,6 +74,10 @@ class FinancialApiTest extends TestCase
             'id_categoria' => $incomeCategory,
         ])->assertOk()
             ->assertJsonPath('data.income.descricao', 'Salario ajustado');
+        $this->assertDatabaseHas('incomes', [
+            'id' => $income['id'],
+            'description' => 'Salario ajustado',
+        ]);
 
         $this->withToken($token)->putJson('/api/expenses/'.$expense['id'], [
             'valor' => 800.50,
@@ -64,6 +86,10 @@ class FinancialApiTest extends TestCase
             'id_categoria' => $expenseCategory,
         ])->assertOk()
             ->assertJsonPath('data.expense.descricao', 'Mercado mensal');
+        $this->assertDatabaseHas('expenses', [
+            'id' => $expense['id'],
+            'description' => 'Mercado mensal',
+        ]);
 
         $goal = $this->withToken($token)->postJson('/api/goals', [
             'titulo' => 'Reserva',
@@ -72,6 +98,10 @@ class FinancialApiTest extends TestCase
             'data_limite' => '2026-12-31',
         ])->assertCreated()
             ->json('data.goal');
+        $this->assertDatabaseHas('financial_goals', [
+            'id' => $goal['id_meta'],
+            'title' => 'Reserva',
+        ]);
 
         $this->withToken($token)->putJson('/api/goals/'.$goal['id_meta'], [
             'titulo' => 'Reserva ajustada',
@@ -82,18 +112,41 @@ class FinancialApiTest extends TestCase
         ])->assertOk()
             ->assertJsonPath('data.goal.titulo', 'Reserva ajustada')
             ->assertJsonPath('data.goal.valor_atual', 2500);
+        $this->assertDatabaseHas('financial_goals', [
+            'id' => $goal['id_meta'],
+            'title' => 'Reserva ajustada',
+            'current_amount' => 2500,
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/goals/'.$goal['id_meta'])
+            ->assertOk()
+            ->assertJsonPath('data.goal.id_meta', $goal['id_meta']);
 
         $customCategory = $this->withToken($token)->postJson('/api/categories', [
             'nome' => 'Freelas',
             'tipo' => 'income',
         ])->assertCreated()
             ->json('data.category');
+        $this->assertDatabaseHas('categories', [
+            'id' => $customCategory['id_categoria'],
+            'name' => 'Freelas',
+        ]);
 
         $this->withToken($token)->putJson('/api/categories/'.$customCategory['id_categoria'], [
             'nome' => 'Freelas Premium',
             'tipo' => 'income',
         ])->assertOk()
             ->assertJsonPath('data.category.nome', 'Freelas Premium');
+        $this->assertDatabaseHas('categories', [
+            'id' => $customCategory['id_categoria'],
+            'name' => 'Freelas Premium',
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/categories/'.$customCategory['id_categoria'])
+            ->assertOk()
+            ->assertJsonPath('data.category.id_categoria', $customCategory['id_categoria']);
 
         $this->withToken($token)
             ->getJson('/api/dashboard?mes=5&ano=2026')
@@ -126,6 +179,34 @@ class FinancialApiTest extends TestCase
                     ],
                 ],
             ]);
+
+        $this->withToken($token)
+            ->deleteJson('/api/goals/'.$goal['id_meta'])
+            ->assertOk();
+        $this->assertDatabaseMissing('financial_goals', [
+            'id' => $goal['id_meta'],
+        ]);
+
+        $this->withToken($token)
+            ->deleteJson('/api/incomes/'.$income['id'])
+            ->assertOk();
+        $this->assertDatabaseMissing('incomes', [
+            'id' => $income['id'],
+        ]);
+
+        $this->withToken($token)
+            ->deleteJson('/api/expenses/'.$expense['id'])
+            ->assertOk();
+        $this->assertDatabaseMissing('expenses', [
+            'id' => $expense['id'],
+        ]);
+
+        $this->withToken($token)
+            ->deleteJson('/api/categories/'.$customCategory['id_categoria'])
+            ->assertOk();
+        $this->assertDatabaseMissing('categories', [
+            'id' => $customCategory['id_categoria'],
+        ]);
     }
 
     public function test_seeded_admin_can_access_admin_overview(): void
