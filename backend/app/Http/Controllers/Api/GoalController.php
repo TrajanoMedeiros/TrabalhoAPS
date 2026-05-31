@@ -8,7 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\GoalRequest;
 use App\Http\Resources\GoalResource;
 use App\Models\FinancialGoal;
+use App\Models\User;
 use App\Services\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,7 +25,7 @@ class GoalController extends Controller
     {
         $goals = FinancialGoal::query()
             ->with('category')
-            ->whereBelongsTo($request->user())
+            ->where('user_id', $this->authenticatedUserId($request))
             ->orderBy('due_on')
             ->latest()
             ->get()
@@ -66,6 +68,24 @@ class GoalController extends Controller
 
     private function authorizeOwner(Request $request, FinancialGoal $goal): void
     {
-        abort_unless($goal->user_id === $request->user()->id, 404, 'Meta nao encontrada.');
+        abort_unless((int) $goal->user_id === $this->authenticatedUserId($request), 404, 'Meta nao encontrada.');
+    }
+
+    private function authenticatedUserId(Request $request): int
+    {
+        $user = $request->user();
+
+        if ($user instanceof User) {
+            return (int) $user->id;
+        }
+
+        if (is_array($user)) {
+            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
+            if ($id > 0) {
+                return $id;
+            }
+        }
+
+        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }

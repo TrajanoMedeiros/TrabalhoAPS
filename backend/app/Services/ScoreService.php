@@ -16,7 +16,7 @@ class ScoreService
         $income = $this->summary->total(Income::query(), $user);
         $expense = $this->summary->total(Expense::query(), $user);
         $balance = $income - $expense;
-        $goals = FinancialGoal::query()->whereBelongsTo($user)->get();
+        $goals = FinancialGoal::query()->where('user_id', $user->id)->get();
 
         $score = 500.0;
         $signals = [];

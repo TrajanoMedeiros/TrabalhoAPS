@@ -9,7 +9,9 @@ use App\Http\Requests\TransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Expense;
 use App\Models\Income;
+use App\Models\User;
 use App\Services\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -99,7 +101,7 @@ class TransactionController extends Controller
     private function list(Builder $query, Request $request, string $type): array
     {
         $filters = $this->periodFilters($request);
-        $query->with('category')->whereBelongsTo($request->user());
+        $query->with('category')->where('user_id', $this->authenticatedUserId($request));
 
         if (isset($filters['mes'])) {
             $query->whereMonth('occurred_on', $filters['mes']);
@@ -127,6 +129,24 @@ class TransactionController extends Controller
 
     private function authorizeOwner(Request $request, Model $model): void
     {
-        abort_unless($model->user_id === $request->user()->id, 404, 'Transacao nao encontrada.');
+        abort_unless((int) $model->user_id === $this->authenticatedUserId($request), 404, 'Transacao nao encontrada.');
+    }
+
+    private function authenticatedUserId(Request $request): int
+    {
+        $user = $request->user();
+
+        if ($user instanceof User) {
+            return (int) $user->id;
+        }
+
+        if (is_array($user)) {
+            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
+            if ($id > 0) {
+                return $id;
+            }
+        }
+
+        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }

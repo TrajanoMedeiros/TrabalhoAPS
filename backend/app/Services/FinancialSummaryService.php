@@ -19,7 +19,7 @@ class FinancialSummaryService
         $totalExpense = $this->total(Expense::query(), $user, $filters);
         $goals = FinancialGoal::query()
             ->with('category')
-            ->whereBelongsTo($user)
+            ->where('user_id', $user->id)
             ->orderBy('due_on')
             ->get();
 
@@ -66,12 +66,12 @@ class FinancialSummaryService
 
     public function total(Builder $query, User $user, array $filters = []): float
     {
-        return (float) $this->withPeriod($query->whereBelongsTo($user), $filters)->sum('amount');
+        return (float) $this->withPeriod($query->where('user_id', $user->id), $filters)->sum('amount');
     }
 
     private function distribution(Builder $query, User $user, array $filters): array
     {
-        return $this->withPeriod($query->whereBelongsTo($user)->with('category'), $filters)
+        return $this->withPeriod($query->where('user_id', $user->id)->with('category'), $filters)
             ->get()
             ->groupBy(fn (Income|Expense $transaction): string => $transaction->category?->name ?? 'Sem categoria')
             ->map(fn ($items, string $category): array => [
@@ -87,7 +87,7 @@ class FinancialSummaryService
     {
         $incomes = Income::query()
             ->with('category')
-            ->whereBelongsTo($user)
+            ->where('user_id', $user->id)
             ->latest('occurred_on')
             ->limit(5)
             ->get()
@@ -95,7 +95,7 @@ class FinancialSummaryService
 
         $expenses = Expense::query()
             ->with('category')
-            ->whereBelongsTo($user)
+            ->where('user_id', $user->id)
             ->latest('occurred_on')
             ->limit(5)
             ->get()
