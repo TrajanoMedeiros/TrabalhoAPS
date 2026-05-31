@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\ApiResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -74,26 +73,5 @@ class UserController extends Controller
     private function presentUser(User $user): array
     {
         return UserResource::make($user);
-    }
-
-    private function authenticatedUser(Request $request): User
-    {
-        $user = $request->user();
-
-        if ($user instanceof User) {
-            return $user;
-        }
-
-        if (is_array($user)) {
-            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
-            if ($id > 0) {
-                $model = User::query()->find($id);
-                if ($model instanceof User) {
-                    return $model;
-                }
-            }
-        }
-
-        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }

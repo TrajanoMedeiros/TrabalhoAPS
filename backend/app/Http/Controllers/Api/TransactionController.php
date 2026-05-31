@@ -9,9 +9,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Expense;
 use App\Models\Income;
-use App\Models\User;
 use App\Services\ApiResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -54,14 +52,14 @@ class TransactionController extends Controller
 
     public function storeIncome(TransactionRequest $request): JsonResponse
     {
-        $income = $this->storeTransaction->execute($request->user(), 'income', $request->toDto());
+        $income = $this->storeTransaction->execute($this->authenticatedUser($request), 'income', $request->toDto());
 
         return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')], 'Receita criada com sucesso.', 201);
     }
 
     public function storeExpense(TransactionRequest $request): JsonResponse
     {
-        $expense = $this->storeTransaction->execute($request->user(), 'expense', $request->toDto());
+        $expense = $this->storeTransaction->execute($this->authenticatedUser($request), 'expense', $request->toDto());
 
         return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')], 'Despesa criada com sucesso.', 201);
     }
@@ -69,7 +67,7 @@ class TransactionController extends Controller
     public function updateIncome(TransactionRequest $request, Income $income): JsonResponse
     {
         $this->authorizeOwner($request, $income);
-        $income = $this->updateTransaction->execute($request->user(), $income, 'income', $request->toDto());
+        $income = $this->updateTransaction->execute($this->authenticatedUser($request), $income, 'income', $request->toDto());
 
         return ApiResponse::success(['income' => TransactionResource::make($income->load('category'), 'income')], 'Receita atualizada com sucesso.');
     }
@@ -77,7 +75,7 @@ class TransactionController extends Controller
     public function updateExpense(TransactionRequest $request, Expense $expense): JsonResponse
     {
         $this->authorizeOwner($request, $expense);
-        $expense = $this->updateTransaction->execute($request->user(), $expense, 'expense', $request->toDto());
+        $expense = $this->updateTransaction->execute($this->authenticatedUser($request), $expense, 'expense', $request->toDto());
 
         return ApiResponse::success(['expense' => TransactionResource::make($expense->load('category'), 'expense')], 'Despesa atualizada com sucesso.');
     }
@@ -130,23 +128,5 @@ class TransactionController extends Controller
     private function authorizeOwner(Request $request, Model $model): void
     {
         abort_unless((int) $model->user_id === $this->authenticatedUserId($request), 404, 'Transacao nao encontrada.');
-    }
-
-    private function authenticatedUserId(Request $request): int
-    {
-        $user = $request->user();
-
-        if ($user instanceof User) {
-            return (int) $user->id;
-        }
-
-        if (is_array($user)) {
-            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
-            if ($id > 0) {
-                return $id;
-            }
-        }
-
-        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }

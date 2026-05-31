@@ -18,9 +18,10 @@ class DashboardController extends Controller
             'mes' => ['nullable', 'integer', 'between:1,12'],
             'ano' => ['nullable', 'integer', 'between:2000,2100'],
         ]);
+        $user = $this->authenticatedUser($request);
 
         return ApiResponse::success([
-            'dashboard' => $this->summary->summary($request->user(), $filters),
+            'dashboard' => $this->summary->summary($user, $filters),
         ]);
     }
 
@@ -29,9 +30,10 @@ class DashboardController extends Controller
         $data = $request->validate([
             'meses' => ['nullable', 'integer', 'between:1,24'],
         ]);
+        $user = $this->authenticatedUser($request);
 
         return ApiResponse::success([
-            'history' => $this->summary->monthlyHistory($request->user(), (int) ($data['meses'] ?? 6)),
+            'history' => $this->summary->monthlyHistory($user, (int) ($data['meses'] ?? 6)),
         ]);
     }
 }

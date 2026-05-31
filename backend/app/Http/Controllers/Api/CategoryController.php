@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use App\Models\User;
 use App\Services\ApiResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -85,23 +83,5 @@ class CategoryController extends Controller
     {
         $userId = $this->authenticatedUserId($request);
         abort_unless($category->user_id === null || (int) $category->user_id === $userId, 404, 'Categoria nao encontrada.');
-    }
-
-    private function authenticatedUserId(Request $request): int
-    {
-        $user = $request->user();
-
-        if ($user instanceof User) {
-            return (int) $user->id;
-        }
-
-        if (is_array($user)) {
-            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
-            if ($id > 0) {
-                return $id;
-            }
-        }
-
-        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }

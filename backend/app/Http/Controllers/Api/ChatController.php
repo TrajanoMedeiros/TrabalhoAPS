@@ -24,13 +24,14 @@ class ChatController extends Controller
         $data = $request->validate([
             'mensagem' => ['required', 'string', 'min:3', 'max:600'],
         ]);
+        $user = $this->authenticatedUser($request);
 
         $dashboard = [];
         $score = [];
 
         try {
-            $dashboard = $this->summary->summary($request->user());
-            $score = $this->score->calculate($request->user());
+            $dashboard = $this->summary->summary($user);
+            $score = $this->score->calculate($user);
         } catch (Throwable $exception) {
             report($exception);
         }

@@ -68,7 +68,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return ApiResponse::success([
-            'user' => $this->presentUser($request->user()),
+            'user' => $this->presentUser($this->authenticatedUser($request)),
         ]);
     }
 

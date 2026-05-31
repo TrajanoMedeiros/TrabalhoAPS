@@ -15,7 +15,7 @@ class ScoreController extends Controller
     public function show(Request $request): JsonResponse
     {
         return ApiResponse::success([
-            'score' => $this->score->calculate($request->user()),
+            'score' => $this->score->calculate($this->authenticatedUser($request)),
         ]);
     }
 }

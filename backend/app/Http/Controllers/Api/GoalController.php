@@ -8,9 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\GoalRequest;
 use App\Http\Resources\GoalResource;
 use App\Models\FinancialGoal;
-use App\Models\User;
 use App\Services\ApiResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -38,7 +36,7 @@ class GoalController extends Controller
 
     public function store(GoalRequest $request): JsonResponse
     {
-        $goal = $this->storeGoal->execute($request->user(), $request->toDto());
+        $goal = $this->storeGoal->execute($this->authenticatedUser($request), $request->toDto());
 
         return ApiResponse::success(['goal' => GoalResource::make($goal->load('category'))], 'Meta criada com sucesso.', 201);
     }
@@ -53,7 +51,7 @@ class GoalController extends Controller
     public function update(GoalRequest $request, FinancialGoal $goal): JsonResponse
     {
         $this->authorizeOwner($request, $goal);
-        $goal = $this->updateGoal->execute($request->user(), $goal, $request->toDto());
+        $goal = $this->updateGoal->execute($this->authenticatedUser($request), $goal, $request->toDto());
 
         return ApiResponse::success(['goal' => GoalResource::make($goal->load('category'))], 'Meta atualizada com sucesso.');
     }
@@ -69,23 +67,5 @@ class GoalController extends Controller
     private function authorizeOwner(Request $request, FinancialGoal $goal): void
     {
         abort_unless((int) $goal->user_id === $this->authenticatedUserId($request), 404, 'Meta nao encontrada.');
-    }
-
-    private function authenticatedUserId(Request $request): int
-    {
-        $user = $request->user();
-
-        if ($user instanceof User) {
-            return (int) $user->id;
-        }
-
-        if (is_array($user)) {
-            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
-            if ($id > 0) {
-                return $id;
-            }
-        }
-
-        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }
