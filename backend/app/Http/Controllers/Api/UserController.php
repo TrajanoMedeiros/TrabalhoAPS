@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,12 +17,12 @@ class UserController extends Controller
 {
     public function show(Request $request): JsonResponse
     {
-        return ApiResponse::success(['user' => $this->presentUser($request->user())]);
+        return ApiResponse::success(['user' => $this->presentUser($this->authenticatedUser($request))]);
     }
 
     public function update(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->authenticatedUser($request);
         $data = $request->validate([
             'nome' => ['sometimes', 'required', 'string', 'min:2', 'max:120'],
             'email' => ['sometimes', 'required', 'email', 'max:180', Rule::unique('users', 'email')->ignore($user->id)],
@@ -50,7 +51,7 @@ class UserController extends Controller
             'nova_senha' => ['required', 'string', 'min:8', 'max:255'],
         ]);
 
-        $user = $request->user();
+        $user = $this->authenticatedUser($request);
         if (! Hash::check($data['senha_atual'], $user->password)) {
             throw ValidationException::withMessages([
                 'senha_atual' => 'Senha atual incorreta.',
@@ -65,7 +66,7 @@ class UserController extends Controller
 
     public function destroy(Request $request): JsonResponse
     {
-        $request->user()->delete();
+        $this->authenticatedUser($request)->delete();
 
         return ApiResponse::success([], 'Conta removida com sucesso.');
     }
@@ -73,5 +74,26 @@ class UserController extends Controller
     private function presentUser(User $user): array
     {
         return UserResource::make($user);
+    }
+
+    private function authenticatedUser(Request $request): User
+    {
+        $user = $request->user();
+
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        if (is_array($user)) {
+            $id = (int) ($user['id'] ?? $user['id_usuario'] ?? 0);
+            if ($id > 0) {
+                $model = User::query()->find($id);
+                if ($model instanceof User) {
+                    return $model;
+                }
+            }
+        }
+
+        throw new AuthenticationException('Usuario autenticado invalido.');
     }
 }
