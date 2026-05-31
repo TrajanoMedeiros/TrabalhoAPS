@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Expense;
+use App\Models\Income;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -160,5 +163,26 @@ class FinancialApiTest extends TestCase
                     ],
                 ],
             ]);
+    }
+
+    public function test_seeded_user_has_demo_financial_dataset_until_current_month(): void
+    {
+        $this->seed();
+
+        $user = User::query()->where('email', 'usuario@saldoo.local')->firstOrFail();
+        $firstIncome = Income::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
+        $firstExpense = Expense::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
+        $lastIncome = Income::query()->where('user_id', $user->id)->latest('occurred_on')->first();
+        $lastExpense = Expense::query()->where('user_id', $user->id)->latest('occurred_on')->first();
+
+        $this->assertNotNull($firstIncome);
+        $this->assertNotNull($firstExpense);
+        $this->assertNotNull($lastIncome);
+        $this->assertNotNull($lastExpense);
+
+        $this->assertTrue($firstIncome->occurred_on->format('Y-m') === '2025-01');
+        $this->assertTrue($firstExpense->occurred_on->format('Y-m') === '2025-01');
+        $this->assertTrue($lastIncome->occurred_on->format('Y-m') === now()->format('Y-m'));
+        $this->assertTrue($lastExpense->occurred_on->format('Y-m') === now()->format('Y-m'));
     }
 }
