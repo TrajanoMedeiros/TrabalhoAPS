@@ -6,10 +6,12 @@ import type { ApiRequest, Setter } from '../shared'
 
 type SettingsActionDependencies = {
   categoryForm: CategoryForm
+  editingCategory: Category | null
   passwordForm: PasswordForm
   profileForm: ProfileForm
   request: ApiRequest
   refreshData: () => Promise<void>
+  setEditingCategory: Setter<Category | null>
   setCategoryForm: Setter<CategoryForm>
   setError: Setter<string | null>
   setNotice: Setter<string | null>
@@ -21,10 +23,12 @@ type SettingsActionDependencies = {
 
 export function useSettingsActions({
   categoryForm,
+  editingCategory,
   passwordForm,
   profileForm,
   request,
   refreshData,
+  setEditingCategory,
   setCategoryForm,
   setError,
   setNotice,
@@ -35,20 +39,34 @@ export function useSettingsActions({
 }: SettingsActionDependencies) {
   async function handleCategorySubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const isEditing = editingCategory !== null
+
     setSaving('category')
     setError(null)
     setNotice(null)
 
     try {
-      await request('/api/categories', {
-        method: 'POST',
-        body: JSON.stringify(categoryForm),
-      })
+      await request(
+        isEditing ? `/api/categories/${editingCategory.id_categoria}` : '/api/categories',
+        {
+          method: isEditing ? 'PUT' : 'POST',
+          body: JSON.stringify(categoryForm),
+        },
+      )
+
       setCategoryForm(initialCategoryForm)
-      setNotice('Categoria criada.')
+      setEditingCategory(null)
+      setNotice(isEditing ? 'Categoria atualizada.' : 'Categoria criada.')
       await refreshData()
     } catch (categoryError) {
-      setError(getErrorMessage(categoryError, 'Nao foi possivel criar a categoria.'))
+      setError(
+        getErrorMessage(
+          categoryError,
+          isEditing
+            ? 'Nao foi possivel atualizar a categoria.'
+            : 'Nao foi possivel criar a categoria.',
+        ),
+      )
     } finally {
       setSaving(null)
     }
@@ -63,6 +81,12 @@ export function useSettingsActions({
 
     try {
       await request(`/api/categories/${category.id_categoria}`, { method: 'DELETE' })
+
+      if (editingCategory && editingCategory.id_categoria === category.id_categoria) {
+        setCategoryForm(initialCategoryForm)
+        setEditingCategory(null)
+      }
+
       setNotice('Categoria removida.')
       await refreshData()
     } catch (deleteError) {

@@ -5,9 +5,11 @@ import type { Goal, GoalForm, SavingAction } from '../../types'
 import type { ApiRequest, Setter } from '../shared'
 
 type GoalActionDependencies = {
+  editingGoal: Goal | null
   goalForm: GoalForm
   request: ApiRequest
   refreshData: () => Promise<void>
+  setEditingGoal: Setter<Goal | null>
   setError: Setter<string | null>
   setGoalForm: Setter<GoalForm>
   setNotice: Setter<string | null>
@@ -15,9 +17,11 @@ type GoalActionDependencies = {
 }
 
 export function useGoalActions({
+  editingGoal,
   goalForm,
   request,
   refreshData,
+  setEditingGoal,
   setError,
   setGoalForm,
   setNotice,
@@ -25,27 +29,38 @@ export function useGoalActions({
 }: GoalActionDependencies) {
   async function handleGoalSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const isEditing = editingGoal !== null
+
     setSaving('goal')
     setError(null)
     setNotice(null)
 
     try {
-      await request('/api/goals', {
-        method: 'POST',
-        body: JSON.stringify({
-          titulo: goalForm.titulo,
-          valor_alvo: Number(goalForm.valor_alvo),
-          valor_atual: Number(goalForm.valor_atual || 0),
-          data_limite: goalForm.data_limite || null,
-          id_categoria: goalForm.id_categoria ? Number(goalForm.id_categoria) : null,
-        }),
-      })
+      await request(
+        isEditing ? `/api/goals/${editingGoal.id_meta}` : '/api/goals',
+        {
+          method: isEditing ? 'PUT' : 'POST',
+          body: JSON.stringify({
+            titulo: goalForm.titulo,
+            valor_alvo: Number(goalForm.valor_alvo),
+            valor_atual: Number(goalForm.valor_atual || 0),
+            data_limite: goalForm.data_limite || null,
+            id_categoria: goalForm.id_categoria ? Number(goalForm.id_categoria) : null,
+          }),
+        },
+      )
 
       setGoalForm(initialGoalForm)
-      setNotice('Meta criada.')
+      setEditingGoal(null)
+      setNotice(isEditing ? 'Meta atualizada.' : 'Meta criada.')
       await refreshData()
     } catch (goalError) {
-      setError(getErrorMessage(goalError, 'Nao foi possivel salvar a meta.'))
+      setError(
+        getErrorMessage(
+          goalError,
+          isEditing ? 'Nao foi possivel atualizar a meta.' : 'Nao foi possivel salvar a meta.',
+        ),
+      )
     } finally {
       setSaving(null)
     }
@@ -86,6 +101,12 @@ export function useGoalActions({
 
     try {
       await request(`/api/goals/${goal.id_meta}`, { method: 'DELETE' })
+
+      if (editingGoal && editingGoal.id_meta === goal.id_meta) {
+        setGoalForm(initialGoalForm)
+        setEditingGoal(null)
+      }
+
       setNotice('Meta removida.')
       await refreshData()
     } catch (deleteError) {

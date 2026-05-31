@@ -61,9 +61,12 @@ function App() {
           transactionForm={app.transactionForm}
           categories={app.transactionCategories}
           transactions={app.transactions}
+          editingTransaction={app.editingTransaction}
           saving={app.saving}
           onTransactionFormChange={app.setTransactionForm}
           onSubmit={app.handleTransactionSubmit}
+          onEdit={app.startTransactionEdit}
+          onCancelEdit={app.cancelTransactionEdit}
           onDelete={app.handleDeleteTransaction}
         />
       )}
@@ -72,9 +75,12 @@ function App() {
           goalForm={app.goalForm}
           categories={app.expenseCategories}
           goals={app.goals}
+          editingGoal={app.editingGoal}
           saving={app.saving}
           onGoalFormChange={app.setGoalForm}
           onSubmit={app.handleGoalSubmit}
+          onEdit={app.startGoalEdit}
+          onCancelEdit={app.cancelGoalEdit}
           onProgress={app.handleGoalProgress}
           onDelete={app.handleDeleteGoal}
         />
@@ -96,6 +102,7 @@ function App() {
           passwordForm={app.passwordForm}
           categoryForm={app.categoryForm}
           categories={app.categories}
+          editingCategory={app.editingCategory}
           saving={app.saving}
           onProfileFormChange={app.setProfileForm}
           onPasswordFormChange={app.setPasswordForm}
@@ -103,6 +110,8 @@ function App() {
           onProfileSubmit={app.handleProfileSubmit}
           onPasswordSubmit={app.handlePasswordSubmit}
           onCategorySubmit={app.handleCategorySubmit}
+          onCategoryEdit={app.startCategoryEdit}
+          onCategoryEditCancel={app.cancelCategoryEdit}
           onCategoryDelete={app.handleDeleteCategory}
         />
       )}

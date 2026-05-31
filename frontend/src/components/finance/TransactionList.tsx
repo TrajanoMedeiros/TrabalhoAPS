@@ -1,4 +1,4 @@
-import { ArrowDownCircle, ArrowUpCircle, Trash2 } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, Pencil, Trash2 } from 'lucide-react'
 import { Button, EmptyState } from '../ui'
 import type { SavingAction, TransactionWithKind } from '../../types'
 import { formatDate, formatMoney } from '../../utils/format'
@@ -7,11 +7,13 @@ export function TransactionList({
   transactions,
   saving,
   onDelete,
+  onEdit,
   compact = false,
 }: {
   transactions: TransactionWithKind[]
   saving: SavingAction
   onDelete: (transaction: TransactionWithKind) => void
+  onEdit?: (transaction: TransactionWithKind) => void
   compact?: boolean
 }) {
   if (transactions.length === 0) {
@@ -58,15 +60,28 @@ export function TransactionList({
                 {formatMoney(transaction.valor)}
               </p>
               {!compact && (
-                <Button
-                  variant="danger"
-                  onClick={() => onDelete(transaction)}
-                  disabled={saving === 'delete'}
-                  className="min-h-10 px-3"
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  <span className="sr-only">Remover</span>
-                </Button>
+                <>
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => onEdit(transaction)}
+                      disabled={saving === 'transaction'}
+                      className="min-h-10 px-3"
+                    >
+                      <Pencil className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">Editar</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="danger"
+                    onClick={() => onDelete(transaction)}
+                    disabled={saving === 'delete'}
+                    className="min-h-10 px-3"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    <span className="sr-only">Remover</span>
+                  </Button>
+                </>
               )}
             </div>
           </article>

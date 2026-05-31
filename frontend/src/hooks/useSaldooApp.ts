@@ -32,6 +32,7 @@ import type {
   SavingAction,
   Score,
   Transaction,
+  TransactionWithKind,
   User,
   View,
 } from '../types'
@@ -61,6 +62,9 @@ export function useSaldooApp() {
   const [transactionForm, setTransactionForm] = useState(initialTransactionForm)
   const [goalForm, setGoalForm] = useState(initialGoalForm)
   const [categoryForm, setCategoryForm] = useState(initialCategoryForm)
+  const [editingTransaction, setEditingTransaction] = useState<TransactionWithKind | null>(null)
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [profileForm, setProfileForm] = useState(initialProfileForm)
   const [passwordForm, setPasswordForm] = useState(initialPasswordForm)
   const [chatInput, setChatInput] = useState('')
@@ -98,6 +102,9 @@ export function useSaldooApp() {
     setIncomes([])
     setExpenses([])
     setGoals([])
+    setEditingTransaction(null)
+    setEditingGoal(null)
+    setEditingCategory(null)
     setNotice(null)
     setActiveView('dashboard')
   }, [])
@@ -164,6 +171,54 @@ export function useSaldooApp() {
     return () => window.clearTimeout(refreshTimeout)
   }, [refreshData, token])
 
+  const startTransactionEdit = useCallback((transaction: TransactionWithKind) => {
+    setEditingTransaction(transaction)
+    setTransactionForm({
+      kind: transaction.kind,
+      valor: String(transaction.valor),
+      data: transaction.data,
+      descricao: transaction.descricao ?? '',
+      id_categoria: String(transaction.id_categoria),
+    })
+    setActiveView('transactions')
+  }, [])
+
+  const cancelTransactionEdit = useCallback(() => {
+    setEditingTransaction(null)
+    setTransactionForm(initialTransactionForm)
+  }, [])
+
+  const startGoalEdit = useCallback((goal: Goal) => {
+    setEditingGoal(goal)
+    setGoalForm({
+      titulo: goal.titulo,
+      valor_alvo: String(goal.valor_alvo),
+      valor_atual: String(goal.valor_atual),
+      data_limite: goal.data_limite ?? '',
+      id_categoria: goal.id_categoria ? String(goal.id_categoria) : '',
+    })
+    setActiveView('goals')
+  }, [])
+
+  const cancelGoalEdit = useCallback(() => {
+    setEditingGoal(null)
+    setGoalForm(initialGoalForm)
+  }, [])
+
+  const startCategoryEdit = useCallback((category: Category) => {
+    setEditingCategory(category)
+    setCategoryForm({
+      nome: category.nome,
+      tipo: category.tipo,
+    })
+    setActiveView('settings')
+  }, [])
+
+  const cancelCategoryEdit = useCallback(() => {
+    setEditingCategory(null)
+    setCategoryForm(initialCategoryForm)
+  }, [])
+
   const { handleAuth } = useAuthFlow({
     authMode,
     authForm,
@@ -176,8 +231,10 @@ export function useSaldooApp() {
     syncProfileForm,
   })
   const { handleDeleteTransaction, handleTransactionSubmit } = useTransactionActions({
+    editingTransaction,
     request,
     refreshData,
+    setEditingTransaction,
     setError,
     setNotice,
     setSaving,
@@ -185,9 +242,11 @@ export function useSaldooApp() {
     transactionForm,
   })
   const { handleDeleteGoal, handleGoalProgress, handleGoalSubmit } = useGoalActions({
+    editingGoal,
     goalForm,
     request,
     refreshData,
+    setEditingGoal,
     setError,
     setGoalForm,
     setNotice,
@@ -200,10 +259,12 @@ export function useSaldooApp() {
     handleProfileSubmit,
   } = useSettingsActions({
     categoryForm,
+    editingCategory,
     passwordForm,
     profileForm,
     request,
     refreshData,
+    setEditingCategory,
     setCategoryForm,
     setError,
     setNotice,
@@ -231,7 +292,13 @@ export function useSaldooApp() {
     categories,
     chatInput,
     chatMessages,
+    cancelCategoryEdit,
+    cancelGoalEdit,
+    cancelTransactionEdit,
     dashboard,
+    editingCategory,
+    editingGoal,
+    editingTransaction,
     error,
     expenseCategories,
     goalForm,
@@ -268,6 +335,9 @@ export function useSaldooApp() {
     setProfileForm,
     setTransactionForm,
     setYear,
+    startCategoryEdit,
+    startGoalEdit,
+    startTransactionEdit,
     token,
     transactionCategories,
     transactionForm,

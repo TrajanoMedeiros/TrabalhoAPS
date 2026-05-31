@@ -1,5 +1,5 @@
-import type { FormEvent } from 'react'
-import { Loader2, Plus, Target, Trash2 } from 'lucide-react'
+import { useMemo, useState, type FormEvent } from 'react'
+import { CircleX, Loader2, Pencil, Plus, Search, Target, Trash2 } from 'lucide-react'
 import { DateInput } from '../components/form/DateInput'
 import { SelectInput } from '../components/form/SelectInput'
 import { Button, EmptyState, Field, Panel } from '../components/ui'
@@ -11,25 +11,59 @@ export function GoalsPage({
   goalForm,
   categories,
   goals,
+  editingGoal,
   saving,
   onGoalFormChange,
   onSubmit,
+  onEdit,
+  onCancelEdit,
   onProgress,
   onDelete,
 }: {
   goalForm: GoalForm
   categories: Category[]
   goals: Goal[]
+  editingGoal: Goal | null
   saving: SavingAction
   onGoalFormChange: (value: GoalForm) => void
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  onEdit: (goal: Goal) => void
+  onCancelEdit: () => void
   onProgress: (goal: Goal) => void
   onDelete: (goal: Goal) => void
 }) {
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all')
+  const isEditing = editingGoal !== null
+
+  const filteredGoals = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+
+    return goals.filter((goal) => {
+      const isCompleted = goal.progresso_percentual >= 100
+
+      if (statusFilter === 'active' && isCompleted) return false
+      if (statusFilter === 'completed' && !isCompleted) return false
+      if (!normalizedQuery) return true
+
+      const searchable = [goal.titulo, goal.categoria_nome ?? '', goal.data_limite ?? '']
+        .join(' ')
+        .toLowerCase()
+
+      return searchable.includes(normalizedQuery)
+    })
+  }, [goals, query, statusFilter])
+
   return (
     <section className="grid min-w-0 gap-5 xl:grid-cols-[0.78fr_1.22fr]">
-      <Panel title="Nova meta">
+      <Panel title={isEditing ? 'Editar meta' : 'Nova meta'}>
         <form onSubmit={onSubmit} className="grid gap-4">
+          {isEditing && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
+              Edicao em andamento. Salve para persistir as alteracoes.
+            </div>
+          )}
+
           <Field label="Titulo">
             <input
               required
@@ -95,29 +129,72 @@ export function GoalsPage({
             </Field>
           </div>
 
-          <Button type="submit" disabled={saving === 'goal'}>
-            {saving === 'goal' ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <Target className="h-4 w-4" aria-hidden="true" />
+          <div className="flex flex-wrap gap-2">
+            <Button type="submit" disabled={saving === 'goal'}>
+              {saving === 'goal' ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Target className="h-4 w-4" aria-hidden="true" />
+              )}
+              {isEditing ? 'Salvar alteracoes' : 'Criar meta'}
+            </Button>
+            {isEditing && (
+              <Button type="button" variant="ghost" onClick={onCancelEdit}>
+                <CircleX className="h-4 w-4" aria-hidden="true" />
+                Cancelar
+              </Button>
             )}
-            Criar meta
-          </Button>
+          </div>
         </form>
       </Panel>
 
       <Panel title="Metas em andamento">
         {goals.length > 0 ? (
           <div className="grid gap-4">
-            {goals.map((goal) => (
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <label className="relative block">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Buscar por titulo ou categoria"
+                  className={`${inputClass} pl-9`}
+                />
+              </label>
+              <div className="grid grid-cols-3 gap-1 rounded-2xl bg-slate-100 p-1 text-xs font-extrabold">
+                <GoalFilterButton
+                  label="Todas"
+                  active={statusFilter === 'all'}
+                  onClick={() => setStatusFilter('all')}
+                />
+                <GoalFilterButton
+                  label="Abertas"
+                  active={statusFilter === 'active'}
+                  onClick={() => setStatusFilter('active')}
+                />
+                <GoalFilterButton
+                  label="Concl."
+                  active={statusFilter === 'completed'}
+                  onClick={() => setStatusFilter('completed')}
+                />
+              </div>
+            </div>
+
+            {filteredGoals.map((goal) => (
               <GoalCard
                 key={goal.id_meta}
                 goal={goal}
+                editing={editingGoal?.id_meta === goal.id_meta}
                 saving={saving}
+                onEdit={onEdit}
                 onProgress={onProgress}
                 onDelete={onDelete}
               />
             ))}
+
+            {filteredGoals.length === 0 && (
+              <EmptyState>Nenhuma meta encontrada para o filtro atual.</EmptyState>
+            )}
           </div>
         ) : (
           <EmptyState>Crie sua primeira meta para acompanhar progresso.</EmptyState>
@@ -129,17 +206,25 @@ export function GoalsPage({
 
 function GoalCard({
   goal,
+  editing,
   saving,
+  onEdit,
   onProgress,
   onDelete,
 }: {
   goal: Goal
+  editing: boolean
   saving: SavingAction
+  onEdit: (goal: Goal) => void
   onProgress: (goal: Goal) => void
   onDelete: (goal: Goal) => void
 }) {
   return (
-    <article className="border-b border-slate-100 pb-4 last:border-0">
+    <article
+      className={`border-b pb-4 last:border-0 ${
+        editing ? 'rounded-2xl border-amber-200 bg-amber-50/40 p-3' : 'border-slate-100'
+      }`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="font-black text-slate-950">{goal.titulo}</h3>
@@ -165,6 +250,10 @@ function GoalCard({
           {goal.progresso_percentual.toFixed(1)}% concluida
         </p>
         <div className="flex gap-2">
+          <Button variant="ghost" onClick={() => onEdit(goal)} disabled={saving === 'goal'}>
+            <Pencil className="h-4 w-4" aria-hidden="true" />
+            Editar
+          </Button>
           <Button
             variant="ghost"
             onClick={() => void onProgress(goal)}
@@ -180,5 +269,27 @@ function GoalCard({
         </div>
       </div>
     </article>
+  )
+}
+
+function GoalFilterButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-xl px-3 py-2 transition ${
+        active ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+      }`}
+    >
+      {label}
+    </button>
   )
 }

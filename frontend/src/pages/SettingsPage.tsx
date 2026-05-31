@@ -1,5 +1,5 @@
-import type { FormEvent } from 'react'
-import { Loader2, Plus, ShieldCheck, Trash2, UserRound } from 'lucide-react'
+import { useMemo, useState, type FormEvent } from 'react'
+import { CircleX, Loader2, Pencil, Plus, Search, ShieldCheck, Trash2, UserRound } from 'lucide-react'
 import { SelectInput } from '../components/form/SelectInput'
 import { Button, EmptyState, Field, Panel } from '../components/ui'
 import { inputClass } from '../styles/tokens'
@@ -17,6 +17,7 @@ export function SettingsPage({
   passwordForm,
   categoryForm,
   categories,
+  editingCategory,
   saving,
   onProfileFormChange,
   onPasswordFormChange,
@@ -24,12 +25,15 @@ export function SettingsPage({
   onProfileSubmit,
   onPasswordSubmit,
   onCategorySubmit,
+  onCategoryEdit,
+  onCategoryEditCancel,
   onCategoryDelete,
 }: {
   profileForm: ProfileForm
   passwordForm: PasswordForm
   categoryForm: CategoryForm
   categories: Category[]
+  editingCategory: Category | null
   saving: SavingAction
   onProfileFormChange: (value: ProfileForm) => void
   onPasswordFormChange: (value: PasswordForm) => void
@@ -37,9 +41,24 @@ export function SettingsPage({
   onProfileSubmit: (event: FormEvent<HTMLFormElement>) => void
   onPasswordSubmit: (event: FormEvent<HTMLFormElement>) => void
   onCategorySubmit: (event: FormEvent<HTMLFormElement>) => void
+  onCategoryEdit: (category: Category) => void
+  onCategoryEditCancel: () => void
   onCategoryDelete: (category: Category) => void
 }) {
-  const customCategories = categories.filter((category) => category.id_usuario !== null)
+  const [query, setQuery] = useState('')
+  const customCategories = useMemo(
+    () => categories.filter((category) => category.id_usuario !== null),
+    [categories],
+  )
+  const filteredCategories = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return customCategories
+
+    return customCategories.filter((category) =>
+      `${category.nome} ${category.tipo}`.toLowerCase().includes(normalizedQuery),
+    )
+  }, [customCategories, query])
+  const isEditingCategory = editingCategory !== null
 
   return (
     <section className="grid min-w-0 gap-5 xl:grid-cols-2">
@@ -128,8 +147,14 @@ export function SettingsPage({
         </form>
       </Panel>
 
-      <Panel title="Nova categoria">
+      <Panel title={isEditingCategory ? 'Editar categoria' : 'Nova categoria'}>
         <form onSubmit={onCategorySubmit} className="grid gap-4">
+          {isEditingCategory && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
+              Edicao em andamento. Salve para persistir as alteracoes.
+            </div>
+          )}
+
           <Field label="Nome">
             <input
               required
@@ -159,39 +184,75 @@ export function SettingsPage({
               ]}
             />
           </Field>
-          <Button type="submit" disabled={saving === 'category'}>
-            {saving === 'category' ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <Plus className="h-4 w-4" aria-hidden="true" />
+          <div className="flex flex-wrap gap-2">
+            <Button type="submit" disabled={saving === 'category'}>
+              {saving === 'category' ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Plus className="h-4 w-4" aria-hidden="true" />
+              )}
+              {isEditingCategory ? 'Salvar alteracoes' : 'Criar categoria'}
+            </Button>
+            {isEditingCategory && (
+              <Button type="button" variant="ghost" onClick={onCategoryEditCancel}>
+                <CircleX className="h-4 w-4" aria-hidden="true" />
+                Cancelar
+              </Button>
             )}
-            Criar categoria
-          </Button>
+          </div>
         </form>
       </Panel>
 
       <Panel title="Categorias personalizadas">
         {customCategories.length > 0 ? (
           <div className="grid gap-3">
-            {customCategories.map((category) => (
+            <label className="relative block">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar categoria"
+                className={`${inputClass} pl-9`}
+              />
+            </label>
+
+            {filteredCategories.map((category) => (
               <div
                 key={category.id_categoria}
-                className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0"
+                className={`flex items-center justify-between gap-3 border-b pb-3 last:border-0 ${
+                  editingCategory?.id_categoria === category.id_categoria
+                    ? 'rounded-2xl border-amber-200 bg-amber-50/40 p-3'
+                    : 'border-slate-100'
+                }`}
               >
                 <div>
                   <p className="font-black text-slate-950">{category.nome}</p>
                   <p className="text-sm font-bold text-slate-500">{category.tipo}</p>
                 </div>
-                <Button
-                  variant="danger"
-                  onClick={() => onCategoryDelete(category)}
-                  disabled={saving === 'delete'}
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  Remover
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => onCategoryEdit(category)}
+                    disabled={saving === 'category'}
+                  >
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => onCategoryDelete(category)}
+                    disabled={saving === 'delete'}
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    Remover
+                  </Button>
+                </div>
               </div>
             ))}
+
+            {filteredCategories.length === 0 && (
+              <EmptyState>Nenhuma categoria encontrada para o filtro atual.</EmptyState>
+            )}
           </div>
         ) : (
           <EmptyState>As categorias padrao ja estao disponiveis para uso.</EmptyState>
