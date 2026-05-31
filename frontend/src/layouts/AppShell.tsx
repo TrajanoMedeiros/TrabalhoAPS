@@ -121,6 +121,18 @@ export function AppShell({
     }
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    const closeOnDesktop = () => {
+      if (window.innerWidth >= 1024 && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+        setMobileHeaderHidden(false)
+      }
+    }
+
+    window.addEventListener('resize', closeOnDesktop)
+    return () => window.removeEventListener('resize', closeOnDesktop)
+  }, [mobileMenuOpen])
+
   function handleMobileViewChange(view: View) {
     onViewChange(view)
     setMobileMenuOpen(false)
