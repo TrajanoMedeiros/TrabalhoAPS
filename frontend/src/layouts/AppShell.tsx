@@ -5,6 +5,8 @@ import {
   Loader2,
   LogOut,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   ShieldCheck,
   X,
 } from 'lucide-react'
@@ -18,6 +20,8 @@ import { Button } from '../components/ui'
 import { navItems } from '../routes/navigation'
 import type { Dashboard, User, View } from '../types'
 import { formatMoney, monthName } from '../utils/format'
+
+const sidebarStorageKey = 'saldoo.layout.sidebar-collapsed'
 
 export function AppShell({
   activeView,
@@ -52,6 +56,10 @@ export function AppShell({
   onLogout: () => void
   onViewChange: (view: View) => void
 }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem(sidebarStorageKey) === '1'
+  })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false)
   const lastScrollRef = useRef(0)
@@ -119,26 +127,56 @@ export function AppShell({
     setMobileHeaderHidden(false)
   }
 
+  function toggleSidebar() {
+    setSidebarCollapsed((current) => {
+      const next = !current
+      window.localStorage.setItem(sidebarStorageKey, next ? '1' : '0')
+      return next
+    })
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f7f2] text-slate-950">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-slate-200 bg-white px-4 py-5 lg:flex">
-        <Brand />
+      <aside
+        className={`fixed inset-y-0 left-0 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 lg:flex ${
+          sidebarCollapsed ? 'w-20' : 'w-64'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <Brand compact={sidebarCollapsed} />
+          <button
+            type="button"
+            aria-label={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+            onClick={toggleSidebar}
+            className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+          >
+            {sidebarCollapsed ? (
+              <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+
         <nav className="mt-8 grid gap-2" aria-label="Navegacao principal">
           {navItems.map((item) => (
             <NavButton
               key={item.key}
               item={item}
               active={activeView === item.key}
+              compact={sidebarCollapsed}
               onClick={() => onViewChange(item.key)}
             />
           ))}
         </nav>
-        <div className="mt-auto rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-800">
-            Saldo atual
-          </p>
-          <p className="mt-2 text-2xl font-black text-slate-950">
-            {formatMoney(dashboard?.saldo_atual ?? 0)}
+        <div className={`mt-auto rounded-lg border border-emerald-100 bg-emerald-50 p-4 ${sidebarCollapsed ? 'text-center' : ''}`}>
+          {!sidebarCollapsed && (
+            <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-800">
+              Saldo atual
+            </p>
+          )}
+          <p className={`font-black text-slate-950 ${sidebarCollapsed ? 'text-sm' : 'mt-2 text-2xl'}`}>
+            {sidebarCollapsed ? formatMoney(dashboard?.saldo_atual ?? 0).replace('R$', '').trim() : formatMoney(dashboard?.saldo_atual ?? 0)}
           </p>
         </div>
       </aside>
@@ -152,7 +190,7 @@ export function AppShell({
         />
       )}
 
-      <div className="relative lg:pl-64">
+      <div className={`relative transition-[padding] duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         <header
           className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out lg:translate-y-0 ${
             mobileHeaderHidden ? '-translate-y-full' : 'translate-y-0'
