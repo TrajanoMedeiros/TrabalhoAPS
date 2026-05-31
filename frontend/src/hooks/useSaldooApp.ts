@@ -75,7 +75,12 @@ export function useSaldooApp() {
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState(initialChatMessages)
 
-  const years = useMemo(() => [currentYear - 1, currentYear, currentYear + 1], [])
+  const years = useMemo(() => {
+    const firstYear = currentYear >= 2025 ? 2025 : currentYear - 2
+    const totalYears = Math.max(1, currentYear - firstYear + 1)
+
+    return Array.from({ length: totalYears }, (_, index) => firstYear + index)
+  }, [])
   const transactionCategories = useMemo(
     () => filterTransactionCategories(categories, transactionForm.kind),
     [categories, transactionForm.kind],
