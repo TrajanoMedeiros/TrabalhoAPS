@@ -266,4 +266,76 @@ class FinancialApiTest extends TestCase
         $this->assertTrue($lastIncome->occurred_on->format('Y-m') === now()->format('Y-m'));
         $this->assertTrue($lastExpense->occurred_on->format('Y-m') === now()->format('Y-m'));
     }
+
+    public function test_seeded_user_core_endpoints_are_accessible_without_runtime_errors(): void
+    {
+        $this->seed();
+
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'carlos.silva@saldoo.com',
+            'senha' => 'User@2026',
+        ])->assertOk()
+            ->json('data.token');
+
+        $month = now()->month;
+        $year = now()->year;
+
+        $this->withToken($token)
+            ->getJson('/api/users/me')
+            ->assertOk()
+            ->assertJsonPath('data.user.email', 'carlos.silva@saldoo.com');
+
+        $this->withToken($token)
+            ->getJson('/api/dashboard?mes='.$month.'&ano='.$year)
+            ->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'dashboard' => [
+                        'saldo_atual',
+                        'total_receitas',
+                        'total_despesas',
+                        'taxa_economia',
+                        'distribuicao_gastos',
+                        'distribuicao_receitas',
+                        'metas',
+                        'transacoes_recentes',
+                    ],
+                ],
+            ]);
+
+        $this->withToken($token)
+            ->getJson('/api/dashboard/history?meses=6')
+            ->assertOk()
+            ->assertJsonCount(6, 'data.history');
+
+        $this->withToken($token)
+            ->getJson('/api/categories')
+            ->assertOk()
+            ->assertJsonPath('data.categories.0.id_categoria', fn ($value) => is_int($value));
+
+        $this->withToken($token)
+            ->getJson('/api/incomes?mes='.$month.'&ano='.$year)
+            ->assertOk()
+            ->assertJsonPath('data.incomes.0.id', fn ($value) => is_int($value));
+
+        $this->withToken($token)
+            ->getJson('/api/expenses?mes='.$month.'&ano='.$year)
+            ->assertOk()
+            ->assertJsonPath('data.expenses.0.id', fn ($value) => is_int($value));
+
+        $this->withToken($token)
+            ->getJson('/api/goals')
+            ->assertOk()
+            ->assertJsonPath('data.goals.0.id_meta', fn ($value) => is_int($value));
+
+        $this->withToken($token)
+            ->getJson('/api/score')
+            ->assertOk()
+            ->assertJsonPath('data.score.score', fn ($value) => is_int($value));
+
+        $this->withToken($token)
+            ->postJson('/api/chat', ['mensagem' => 'Me de um resumo financeiro rapido'])
+            ->assertOk()
+            ->assertJsonPath('data.chat.resposta', fn ($value) => is_string($value) && mb_strlen($value) > 0);
+    }
 }
