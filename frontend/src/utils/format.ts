@@ -2,9 +2,17 @@ export const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 })
+const compactNumber = new Intl.NumberFormat('pt-BR', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
 
 export function formatMoney(value: number | string | null | undefined): string {
   return money.format(Number(value ?? 0))
+}
+
+export function formatMoneyCompact(value: number | string | null | undefined): string {
+  return compactNumber.format(Number(value ?? 0))
 }
 
 export function formatDate(value: string | null | undefined): string {

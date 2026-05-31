@@ -10,7 +10,7 @@ export function MobileNav({
 }) {
   return (
     <nav
-      className="grid gap-1.5 lg:hidden"
+      className="grid gap-1.5 xl:hidden"
       aria-label="Navegacao principal"
     >
       {navItems.map((item) => {

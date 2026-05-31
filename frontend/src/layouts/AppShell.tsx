@@ -19,7 +19,7 @@ import { PageTitle } from '../components/PageTitle'
 import { Button } from '../components/ui'
 import { navItems } from '../routes/navigation'
 import type { Dashboard, User, View } from '../types'
-import { formatMoney, monthName } from '../utils/format'
+import { formatMoney, formatMoneyCompact, monthName } from '../utils/format'
 
 const sidebarStorageKey = 'saldoo.layout.sidebar-collapsed'
 
@@ -63,6 +63,7 @@ export function AppShell({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false)
   const lastScrollRef = useRef(0)
+  const mobileMenuOpenRef = useRef(false)
   const monthOptions = useMemo(
     () =>
       Array.from({ length: 12 }, (_, index) => index + 1).map((option) => ({
@@ -81,13 +82,21 @@ export function AppShell({
   )
 
   useEffect(() => {
+    mobileMenuOpenRef.current = mobileMenuOpen
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY
       const delta = currentScroll - lastScrollRef.current
 
-      if (mobileMenuOpen) setMobileMenuOpen(false)
+      if (mobileMenuOpenRef.current) {
+        setMobileHeaderHidden(false)
+        lastScrollRef.current = currentScroll
+        return
+      }
 
-      if (window.innerWidth >= 1024 || currentScroll < 24) {
+      if (window.innerWidth >= 1280 || currentScroll < 24) {
         setMobileHeaderHidden(false)
         lastScrollRef.current = currentScroll
         return
@@ -101,7 +110,7 @@ export function AppShell({
     window.addEventListener('scroll', handleScroll, { passive: true })
 
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [mobileMenuOpen])
+  }, [])
 
   useEffect(() => {
     if (!mobileMenuOpen) return undefined
@@ -123,7 +132,7 @@ export function AppShell({
 
   useEffect(() => {
     const closeOnDesktop = () => {
-      if (window.innerWidth >= 1024 && mobileMenuOpen) {
+      if (window.innerWidth >= 1280 && mobileMenuOpen) {
         setMobileMenuOpen(false)
         setMobileHeaderHidden(false)
       }
@@ -150,7 +159,7 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-[#f6f7f2] text-slate-950">
       <aside
-        className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 lg:flex ${
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 xl:flex ${
           sidebarCollapsed ? 'w-20' : 'w-64'
         }`}
       >
@@ -181,15 +190,33 @@ export function AppShell({
             />
           ))}
         </nav>
-        <div className={`mt-auto rounded-lg border border-emerald-100 bg-emerald-50 p-4 ${sidebarCollapsed ? 'text-center' : ''}`}>
-          {!sidebarCollapsed && (
-            <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-800">
-              Saldo atual
-            </p>
+        <div
+          className={`mt-auto rounded-lg border border-emerald-100 bg-emerald-50 ${
+            sidebarCollapsed ? 'p-2' : 'p-4'
+          }`}
+        >
+          {sidebarCollapsed ? (
+            <div
+              className="grid justify-items-center gap-1 text-center"
+              title={`Saldo atual: ${formatMoney(dashboard?.saldo_atual ?? 0)}`}
+            >
+              <p className="text-[10px] font-extrabold uppercase tracking-wide text-emerald-800">
+                Saldo
+              </p>
+              <p className="text-xs font-black leading-none text-slate-950">
+                {formatMoneyCompact(dashboard?.saldo_atual ?? 0)}
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-800">
+                Saldo atual
+              </p>
+              <p className="mt-2 text-2xl font-black text-slate-950">
+                {formatMoney(dashboard?.saldo_atual ?? 0)}
+              </p>
+            </>
           )}
-          <p className={`font-black text-slate-950 ${sidebarCollapsed ? 'text-sm' : 'mt-2 text-2xl'}`}>
-            {sidebarCollapsed ? formatMoney(dashboard?.saldo_atual ?? 0).replace('R$', '').trim() : formatMoney(dashboard?.saldo_atual ?? 0)}
-          </p>
         </div>
       </aside>
 
@@ -198,25 +225,30 @@ export function AppShell({
           type="button"
           aria-label="Fechar menu"
           onClick={() => setMobileMenuOpen(false)}
-          className="fixed inset-0 z-20 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+          className="fixed inset-0 z-20 bg-slate-950/35 backdrop-blur-[1px] xl:hidden"
         />
       )}
 
-      <div className={`relative z-0 transition-[padding] duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+      <div className={`relative transition-[padding] duration-300 ${sidebarCollapsed ? 'xl:pl-20' : 'xl:pl-64'}`}>
         <header
-          className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out lg:translate-y-0 ${
+          className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out xl:translate-y-0 ${
             mobileHeaderHidden ? '-translate-y-full' : 'translate-y-0'
           }`}
         >
           <div className="mx-auto grid max-w-7xl gap-3 px-4 py-3 sm:px-6 lg:flex lg:items-center lg:justify-between lg:px-8">
-            <div className="flex items-center justify-between gap-3 lg:hidden">
-              <Brand />
-              <div className="flex min-w-0 items-center gap-2">
-                <div className="w-24 shrink-0 rounded-2xl bg-slate-100 px-3 py-2 text-right">
+            <div className="flex items-center justify-between gap-2 xl:hidden">
+              <div className="min-[360px]:hidden">
+                <Brand compact />
+              </div>
+              <div className="hidden min-[360px]:block">
+                <Brand />
+              </div>
+              <div className="flex min-w-0 items-center gap-1.5 min-[360px]:gap-2">
+                <div className="w-[4.25rem] shrink-0 rounded-2xl bg-slate-100 px-2 py-2 text-right min-[360px]:w-20 min-[420px]:w-24">
                   <p className="truncate text-[10px] font-extrabold uppercase text-slate-500">
                     Periodo
                   </p>
-                  <p className="truncate text-sm font-black text-slate-950">
+                  <p className="truncate text-xs font-black text-slate-950 min-[420px]:text-sm">
                     {monthName(month)} {year}
                   </p>
                 </div>
@@ -228,7 +260,7 @@ export function AppShell({
                     setMobileHeaderHidden(false)
                     setMobileMenuOpen((current) => !current)
                   }}
-                  className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white shadow-sm transition duration-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:scale-95"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white shadow-sm transition duration-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:scale-95 min-[360px]:h-12 min-[360px]:w-12"
                 >
                   {mobileMenuOpen ? (
                     <X className="h-5 w-5" aria-hidden="true" />
@@ -239,14 +271,14 @@ export function AppShell({
               </div>
             </div>
 
-            <div className="hidden lg:block">
+            <div className="hidden xl:block">
                 <p className="text-sm font-bold text-slate-500">Periodo selecionado</p>
                 <h1 className="text-2xl font-black text-slate-950">
                   {monthName(month)} de {year}
                 </h1>
             </div>
 
-            <div className="hidden gap-2 lg:flex lg:flex-wrap lg:items-center lg:justify-end">
+            <div className="hidden gap-2 xl:flex xl:flex-wrap xl:items-center xl:justify-end">
               <SelectInput
                 ariaLabel="Mes do periodo"
                 value={month}
@@ -277,14 +309,14 @@ export function AppShell({
           </div>
 
           <div
-            className={`absolute left-0 right-0 top-full px-4 transition duration-300 ease-out sm:px-6 lg:hidden ${
+            className={`absolute left-0 right-0 top-full z-40 px-4 transition duration-300 ease-out sm:px-6 xl:hidden ${
               mobileMenuOpen
                 ? 'pointer-events-auto translate-y-2 opacity-100'
                 : 'pointer-events-none -translate-y-2 opacity-0'
             }`}
           >
-            <div className="mx-auto grid max-h-[calc(100vh-6rem)] max-w-md gap-3 overflow-y-auto rounded-[28px] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-950/15 ring-1 ring-slate-950/5">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mx-auto grid w-full max-h-[calc(100vh-6rem)] max-w-md gap-3 overflow-y-auto rounded-[28px] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-950/15 ring-1 ring-slate-950/5">
+              <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                 <SelectInput
                   ariaLabel="Mes do periodo"
                   value={month}
