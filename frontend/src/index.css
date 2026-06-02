@@ -4,7 +4,7 @@
   font-family:
     "Manrope", "Avenir Next", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
   color: #172033;
-  background: #f6f7f2;
+  background: #f7f9fc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -16,14 +16,14 @@
 }
 
 html {
-  background: radial-gradient(circle at top, #eef7ef 0%, #f6f7f2 55%, #f4f6ef 100%);
+  background: radial-gradient(circle at top, #eef3ff 0%, #f7f9fc 55%, #f3f6fb 100%);
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: radial-gradient(circle at top, #eef7ef 0%, #f6f7f2 55%, #f4f6ef 100%);
+  background: radial-gradient(circle at top, #eef3ff 0%, #f7f9fc 55%, #f3f6fb 100%);
 }
 
 button,
@@ -41,7 +41,7 @@ button:disabled {
 }
 
 ::selection {
-  background: #bbf7d0;
+  background: #bfdbfe;
   color: #020617;
 }
 

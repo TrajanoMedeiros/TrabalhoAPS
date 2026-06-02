@@ -101,7 +101,7 @@ export function DashboardPage({
                   <p className="text-5xl font-black text-slate-950">{score.score}</p>
                   <p className="mt-1 text-sm font-bold text-slate-500">{score.nivel}</p>
                 </div>
-                <div className="h-24 w-24 rounded-full border-[12px] border-emerald-600 bg-emerald-50" />
+                <div className="h-24 w-24 rounded-full border-[12px] border-sky-600 bg-sky-50" />
               </div>
               <div className="grid gap-2">
                 {score.recomendacoes.slice(0, 3).map((recommendation) => (

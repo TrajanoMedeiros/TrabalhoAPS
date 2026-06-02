@@ -20,7 +20,7 @@ export function NavButton({
       aria-label={item.label}
       aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={`inline-flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-extrabold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${
+      className={`inline-flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-extrabold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 ${
         active
           ? 'bg-slate-950 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'

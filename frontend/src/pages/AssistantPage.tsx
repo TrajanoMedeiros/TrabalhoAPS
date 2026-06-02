@@ -101,10 +101,10 @@ export function AssistantPage({
   return (
     <section className="grid min-w-0 gap-5 xl:grid-cols-[1fr_360px]">
       <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-white px-5 py-5">
+        <div className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#22c55e] text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white">
                 <Bot className="h-6 w-6" aria-hidden="true" />
               </div>
               <div>
@@ -139,7 +139,7 @@ export function AssistantPage({
 
         <div
           ref={scrollRef}
-          className="relative grid max-h-[56vh] min-h-[420px] content-start gap-3 overflow-y-auto bg-[#fbfcf8] px-5 py-5"
+          className="relative grid max-h-[56vh] min-h-[420px] content-start gap-3 overflow-y-auto bg-[#fbfcfe] px-5 py-5"
           aria-live="polite"
         >
           {messages.length === 0 ? (
@@ -173,9 +173,9 @@ export function AssistantPage({
           {saving === 'chat' && (
             <div className="flex max-w-[90%] items-start gap-3">
               <AssistantAvatar />
-              <div className="rounded-2xl rounded-tl-md border border-emerald-100 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm">
+              <div className="rounded-2xl rounded-tl-md border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm">
                 <span className="inline-flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-emerald-600" aria-hidden="true" />
+                  <Loader2 className="h-4 w-4 animate-spin text-slate-700" aria-hidden="true" />
                   Analisando seu contexto...
                 </span>
               </div>
@@ -201,7 +201,7 @@ export function AssistantPage({
                 key={suggestion}
                 type="button"
                 onClick={() => onChatInputChange(suggestion)}
-                className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-extrabold text-emerald-800 transition hover:border-emerald-200 hover:bg-emerald-100"
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
               >
                 {suggestion}
               </button>
@@ -248,7 +248,7 @@ export function AssistantPage({
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-2">
-            <MessageSquareText className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+            <MessageSquareText className="h-5 w-5 text-slate-700" aria-hidden="true" />
             <h3 className="font-black text-slate-950">Como o assistente ajuda</h3>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -288,7 +288,7 @@ function MessageBubble({
               } bg-slate-950 text-white`
             : `${startsGroup ? 'rounded-t-2xl rounded-r-2xl rounded-bl-md' : 'rounded-2xl'} ${
                 endsGroup ? 'mb-1' : 'mb-0.5'
-              } border border-emerald-100 bg-white text-slate-700`
+              } border border-slate-200 bg-white text-slate-700`
         }`}
       >
         <p>{message.content}</p>
@@ -318,7 +318,7 @@ function EmptyConversationState({
   onSuggestionSelect: (value: string) => void
 }) {
   return (
-    <div className="grid gap-4 rounded-2xl border border-dashed border-emerald-200 bg-white/80 p-6 shadow-sm">
+    <div className="grid gap-4 rounded-2xl border border-dashed border-slate-200 bg-white/80 p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <AssistantAvatar />
         <div>
@@ -364,7 +364,7 @@ function DayDivider({ value }: { value: string }) {
 
 function AssistantAvatar() {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white">
       <Bot className="h-5 w-5" aria-hidden="true" />
     </div>
   )
@@ -383,7 +383,7 @@ function ContextCard({
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-extrabold uppercase tracking-wide text-slate-500">{label}</p>
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
       </div>

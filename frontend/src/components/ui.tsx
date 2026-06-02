@@ -18,8 +18,8 @@ export function Button({
   onClick,
 }: ButtonProps) {
   const variants = {
-    primary: 'bg-[#22c55e] text-white hover:bg-[#16a34a]',
-    secondary: 'bg-slate-950 text-white hover:bg-slate-800',
+    primary: 'bg-slate-950 text-white hover:bg-slate-800',
+    secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200',
     ghost: 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
     danger: 'border border-rose-200 bg-white text-rose-600 hover:bg-rose-50',
   }
@@ -29,7 +29,7 @@ export function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-bold transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-bold transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
     >
       {children}
     </button>

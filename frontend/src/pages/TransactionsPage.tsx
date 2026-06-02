@@ -215,7 +215,7 @@ function TransactionTypeButton({
 }) {
   const Icon = icon === 'income' ? ArrowUpCircle : ArrowDownCircle
   const activeClass =
-    icon === 'income' ? 'bg-white text-emerald-700 shadow-sm' : 'bg-white text-rose-700 shadow-sm'
+    icon === 'income' ? 'bg-white text-sky-700 shadow-sm' : 'bg-white text-rose-700 shadow-sm'
 
   return (
     <button

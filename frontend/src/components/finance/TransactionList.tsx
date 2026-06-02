@@ -36,9 +36,9 @@ export function TransactionList({
             className="grid gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50 sm:flex sm:items-center sm:justify-between"
           >
             <div className="flex min-w-0 items-center gap-3">
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
-                  isIncome ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                  isIncome ? 'bg-sky-50 text-sky-700' : 'bg-rose-50 text-rose-700'
                 }`}
               >
                 {isIncome ? (
@@ -59,7 +59,7 @@ export function TransactionList({
             <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
               <p
                 className={`text-sm font-black sm:text-right ${
-                  isIncome ? 'text-emerald-700' : 'text-rose-700'
+                  isIncome ? 'text-sky-700' : 'text-rose-700'
                 }`}
               >
                 {isIncome ? '+' : '-'}

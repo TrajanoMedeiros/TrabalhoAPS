@@ -30,7 +30,7 @@ export function HistoryChart({ history }: { history: HistoryItem[] }) {
           <div className="grid gap-1">
             <div className="h-3 overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-emerald-600"
+                className="h-full rounded-full bg-sky-600"
                 style={{ width: `${(item.total_receitas / maxValue) * 100}%` }}
               />
             </div>

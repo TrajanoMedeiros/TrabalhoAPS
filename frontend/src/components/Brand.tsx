@@ -9,7 +9,7 @@ export function Brand({
 }) {
   return (
     <div className={`flex items-center ${compact ? 'justify-center' : 'gap-3'}`}>
-      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-600 text-white">
+      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-slate-950 text-white">
         <WalletCards className="h-6 w-6" aria-hidden="true" />
       </div>
       {!compact && (

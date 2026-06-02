@@ -100,12 +100,12 @@ export function SelectInput<T extends string | number>({
                   onClick={() => selectOption(option)}
                   className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-left text-sm font-extrabold transition duration-150 ${
                     selected
-                      ? 'bg-emerald-50 text-emerald-800'
+                      ? 'bg-sky-50 text-sky-800'
                       : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
                   }`}
                 >
                   <span className="truncate">{option.label}</span>
-                  {selected && <Check className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                  {selected && <Check className="h-4 w-4 shrink-0 text-sky-600" aria-hidden="true" />}
                 </button>
               )
             })}

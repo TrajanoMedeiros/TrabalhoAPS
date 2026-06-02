@@ -30,10 +30,10 @@ export function AuthPage({
   }
 
   return (
-    <main className="flex min-h-screen items-start justify-center bg-[#f6f7f9] px-4 py-14 text-slate-950 sm:py-20">
+    <main className="flex min-h-screen items-start justify-center bg-[#f7f9fc] px-4 py-14 text-slate-950 sm:py-20">
       <section className="grid w-full max-w-[484px] gap-8">
         <div className="text-center">
-          <h1 className="text-5xl font-black tracking-tight text-[#22c55e]">Saldoo</h1>
+          <h1 className="text-5xl font-black tracking-tight text-slate-950">Saldoo</h1>
           <p className="mt-4 text-xl font-medium text-slate-500">Organize suas financas</p>
         </div>
 
@@ -94,7 +94,7 @@ export function AuthPage({
           <button
             type="button"
             onClick={() => switchMode(isRegister ? 'login' : 'register')}
-            className="justify-self-center rounded-full px-3 py-2 text-lg font-medium text-[#22c55e] transition hover:bg-emerald-50"
+            className="justify-self-center rounded-full px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-100"
           >
             {isRegister ? 'Ja tenho conta' : 'Criar conta'}
           </button>

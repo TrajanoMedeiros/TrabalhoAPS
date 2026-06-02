@@ -33,7 +33,6 @@ function App() {
     <AppShell
       activeView={app.activeView}
       user={app.user}
-      dashboard={app.dashboard}
       month={app.month}
       year={app.year}
       years={app.years}

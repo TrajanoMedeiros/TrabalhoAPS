@@ -12,8 +12,8 @@ export function MetricCard({
   tone: 'emerald' | 'blue' | 'rose' | 'amber'
 }) {
   const tones = {
-    emerald: 'bg-emerald-50 text-emerald-700',
-    blue: 'bg-sky-50 text-sky-700',
+    emerald: 'bg-sky-50 text-sky-700',
+    blue: 'bg-indigo-50 text-indigo-700',
     rose: 'bg-rose-50 text-rose-700',
     amber: 'bg-amber-50 text-amber-700',
   }

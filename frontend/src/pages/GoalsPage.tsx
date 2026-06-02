@@ -241,12 +241,12 @@ function GoalCard({
       </div>
       <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
         <div
-          className="h-full rounded-full bg-emerald-600"
+          className="h-full rounded-full bg-sky-600"
           style={{ width: `${goal.progresso_percentual}%` }}
         />
       </div>
       <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
-        <p className="text-sm font-extrabold text-emerald-700">
+        <p className="text-sm font-extrabold text-sky-700">
           {goal.progresso_percentual.toFixed(1)}% concluida
         </p>
         <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">

@@ -18,15 +18,14 @@ import { NavButton } from '../components/NavButton'
 import { PageTitle } from '../components/PageTitle'
 import { Button } from '../components/ui'
 import { navItems } from '../routes/navigation'
-import type { Dashboard, User, View } from '../types'
-import { formatMoney, formatMoneyCompact, monthName } from '../utils/format'
+import type { User, View } from '../types'
+import { monthName } from '../utils/format'
 
 const sidebarStorageKey = 'saldoo.layout.sidebar-collapsed'
 
 export function AppShell({
   activeView,
   user,
-  dashboard,
   month,
   year,
   years,
@@ -42,7 +41,6 @@ export function AppShell({
 }: {
   activeView: View
   user: User | null
-  dashboard: Dashboard | null
   month: number
   year: number
   years: number[]
@@ -157,7 +155,7 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f7f2] text-slate-950">
+    <div className="min-h-screen bg-[#f7f9fc] text-slate-950">
       <aside
         className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 xl:flex ${
           sidebarCollapsed ? 'w-20' : 'w-64'
@@ -169,7 +167,7 @@ export function AppShell({
             type="button"
             aria-label={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
             onClick={toggleSidebar}
-            className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+            className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
           >
             {sidebarCollapsed ? (
               <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
@@ -190,34 +188,6 @@ export function AppShell({
             />
           ))}
         </nav>
-        <div
-          className={`mt-auto rounded-lg border border-emerald-100 bg-emerald-50 ${
-            sidebarCollapsed ? 'p-2' : 'p-4'
-          }`}
-        >
-          {sidebarCollapsed ? (
-            <div
-              className="grid justify-items-center gap-1 text-center"
-              title={`Saldo atual: ${formatMoney(dashboard?.saldo_atual ?? 0)}`}
-            >
-              <p className="text-[10px] font-extrabold uppercase tracking-wide text-emerald-800">
-                Saldo
-              </p>
-              <p className="text-xs font-black leading-none text-slate-950">
-                {formatMoneyCompact(dashboard?.saldo_atual ?? 0)}
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="text-xs font-extrabold uppercase tracking-wide text-emerald-800">
-                Saldo atual
-              </p>
-              <p className="mt-2 text-2xl font-black text-slate-950">
-                {formatMoney(dashboard?.saldo_atual ?? 0)}
-              </p>
-            </>
-          )}
-        </div>
       </aside>
 
       {mobileMenuOpen && (
@@ -260,7 +230,7 @@ export function AppShell({
                     setMobileHeaderHidden(false)
                     setMobileMenuOpen((current) => !current)
                   }}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white shadow-sm transition duration-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:scale-95 min-[360px]:h-12 min-[360px]:w-12"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white shadow-sm transition duration-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 active:scale-95 min-[360px]:h-12 min-[360px]:w-12"
                 >
                   {mobileMenuOpen ? (
                     <X className="h-5 w-5" aria-hidden="true" />

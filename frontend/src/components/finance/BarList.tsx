@@ -18,7 +18,7 @@ export function BarList({
   }
 
   const maxValue = Math.max(1, ...items.map((item) => item.total))
-  const color = tone === 'emerald' ? 'bg-emerald-600' : 'bg-rose-500'
+  const color = tone === 'emerald' ? 'bg-sky-600' : 'bg-rose-500'
 
   return (
     <div className="grid gap-4">
