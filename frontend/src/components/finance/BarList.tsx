@@ -11,7 +11,7 @@ export function BarList({
   if (items.length === 0) {
     return (
       <EmptyState>
-        Sem dados para este periodo. Registre novos lancamentos para revelar a distribuicao por
+        Sem dados para este período. Registre novos lançamentos para revelar a distribuição por
         categoria.
       </EmptyState>
     )

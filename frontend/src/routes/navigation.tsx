@@ -9,8 +9,8 @@ export type NavigationItem = {
 }
 
 export const navItems: NavigationItem[] = [
-  { key: 'dashboard', label: 'Dashboard', mobileLabel: 'Inicio', icon: LayoutDashboard },
-  { key: 'transactions', label: 'Lancamentos', mobileLabel: 'Lanc.', icon: ReceiptText },
+  { key: 'dashboard', label: 'Dashboard', mobileLabel: 'Início', icon: LayoutDashboard },
+  { key: 'transactions', label: 'Lançamentos', mobileLabel: 'Lanç.', icon: ReceiptText },
   { key: 'goals', label: 'Metas', mobileLabel: 'Metas', icon: Target },
   { key: 'assistant', label: 'Assistente', mobileLabel: 'IA', icon: Bot },
   { key: 'settings', label: 'Ajustes', mobileLabel: 'Ajustes', icon: Settings },

@@ -34,7 +34,7 @@ export function AuthPage({
       <section className="grid w-full max-w-[484px] gap-8">
         <div className="text-center">
           <h1 className="text-5xl font-black tracking-tight text-slate-950">Saldoo</h1>
-          <p className="mt-4 text-xl font-medium text-slate-500">Organize suas financas</p>
+          <p className="mt-4 text-xl font-medium text-slate-500">Organize suas finanças</p>
         </div>
 
         <form
@@ -81,7 +81,7 @@ export function AuthPage({
               value={authForm.senha}
               onChange={(event) => onAuthFormChange({ ...authForm, senha: event.target.value })}
               className={`${inputClass} min-h-[60px] text-lg`}
-              placeholder={isRegister ? 'Minimo 8 caracteres' : '••••••••'}
+              placeholder={isRegister ? 'Mínimo 8 caracteres' : '••••••••'}
               autoComplete={isRegister ? 'new-password' : 'current-password'}
             />
           </Field>
@@ -96,7 +96,7 @@ export function AuthPage({
             onClick={() => switchMode(isRegister ? 'login' : 'register')}
             className="justify-self-center rounded-full px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-100"
           >
-            {isRegister ? 'Ja tenho conta' : 'Criar conta'}
+            {isRegister ? 'Já tenho conta' : 'Criar conta'}
           </button>
         </form>
       </section>

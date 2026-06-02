@@ -2,11 +2,11 @@ import type { User, View } from '../types'
 
 export function PageTitle({ activeView, user }: { activeView: View; user: User | null }) {
   const labels = {
-    dashboard: ['Dashboard', `Ola, ${user?.nome ?? 'usuario'}. Aqui esta seu resumo.`],
-    transactions: ['Lancamentos', 'Registre e acompanhe receitas e despesas do periodo.'],
-    goals: ['Metas', 'Transforme planos financeiros em progresso visivel.'],
-    assistant: ['Assistente', 'Receba orientacoes usando os dados da sua conta.'],
-    settings: ['Ajustes', 'Gerencie perfil, seguranca e categorias.'],
+    dashboard: ['Dashboard', `Olá, ${user?.nome ?? 'usuário'}. Aqui está seu resumo.`],
+    transactions: ['Lançamentos', 'Registre e acompanhe receitas e despesas do período.'],
+    goals: ['Metas', 'Transforme planos financeiros em progresso visível.'],
+    assistant: ['Assistente', 'Receba orientações usando os dados da sua conta.'],
+    settings: ['Ajustes', 'Gerencie perfil, segurança e categorias.'],
   } satisfies Record<View, [string, string]>
 
   return (

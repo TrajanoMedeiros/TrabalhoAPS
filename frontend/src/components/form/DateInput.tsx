@@ -128,7 +128,7 @@ export function DateInput({
                 type="button"
                 onClick={() => moveMonth(-1)}
                 className="grid h-10 w-10 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-                aria-label="Mes anterior"
+                aria-label="Mês anterior"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -139,7 +139,7 @@ export function DateInput({
                 type="button"
                 onClick={() => moveMonth(1)}
                 className="grid h-10 w-10 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-                aria-label="Proximo mes"
+                aria-label="Próximo mês"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </button>

@@ -51,7 +51,7 @@ export function AssistantPage({
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showJumpToLatest, setShowJumpToLatest] = useState(false)
   const activeSuggestions = useMemo(
-    () => (suggestions.length > 0 ? suggestions : ['Me de um resumo financeiro rapido.']),
+    () => (suggestions.length > 0 ? suggestions : ['Me dê um resumo financeiro rápido.']),
     [suggestions],
   )
 
@@ -231,7 +231,7 @@ export function AssistantPage({
       <aside className="grid min-w-0 content-start gap-4">
         <ContextCard
           icon={WalletCards}
-          label="Saldo do periodo"
+          label="Saldo do período"
           value={formatMoney(dashboard?.saldo_atual ?? 0)}
         />
         <ContextCard
@@ -252,8 +252,8 @@ export function AssistantPage({
             <h3 className="font-black text-slate-950">Como o assistente ajuda</h3>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            Ele interpreta saldo, gastos, metas e score para sugerir proximos passos objetivos e
-            aplicaveis no seu dia a dia.
+            Ele interpreta saldo, gastos, metas e score para sugerir próximos passos objetivos e
+            aplicáveis no seu dia a dia.
           </p>
         </div>
       </aside>

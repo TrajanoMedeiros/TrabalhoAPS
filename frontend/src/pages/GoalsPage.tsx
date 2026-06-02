@@ -60,18 +60,18 @@ export function GoalsPage({
         <form onSubmit={onSubmit} className="grid gap-4">
           {isEditing && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-              Edicao em andamento. Salve para persistir as alteracoes.
+              Edição em andamento. Salve para persistir as alterações.
             </div>
           )}
 
-          <Field label="Titulo">
+          <Field label="Título">
             <input
               required
               minLength={2}
               value={goalForm.titulo}
               onChange={(event) => onGoalFormChange({ ...goalForm, titulo: event.target.value })}
               className={inputClass}
-              placeholder="Reserva de emergencia"
+              placeholder="Reserva de emergência"
             />
           </Field>
 
@@ -136,7 +136,7 @@ export function GoalsPage({
               ) : (
                 <Target className="h-4 w-4" aria-hidden="true" />
               )}
-              {isEditing ? 'Salvar alteracoes' : 'Criar meta'}
+              {isEditing ? 'Salvar alterações' : 'Criar meta'}
             </Button>
             {isEditing && (
               <Button type="button" variant="ghost" onClick={onCancelEdit}>
@@ -157,7 +157,7 @@ export function GoalsPage({
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar por titulo ou categoria"
+                  placeholder="Buscar por título ou categoria"
                   className={`${inputClass} pl-9`}
                 />
               </label>
@@ -247,7 +247,7 @@ function GoalCard({
       </div>
       <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
         <p className="text-sm font-extrabold text-sky-700">
-          {goal.progresso_percentual.toFixed(1)}% concluida
+          {goal.progresso_percentual.toFixed(1)}% concluída
         </p>
         <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
           <Button

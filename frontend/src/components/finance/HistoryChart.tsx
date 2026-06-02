@@ -6,8 +6,8 @@ export function HistoryChart({ history }: { history: HistoryItem[] }) {
   if (history.length === 0) {
     return (
       <EmptyState>
-        Sem historico suficiente para o grafico. Continue registrando movimentacoes para acompanhar
-        tendencias mensais.
+        Sem histórico suficiente para o gráfico. Continue registrando movimentações para acompanhar
+        tendências mensais.
       </EmptyState>
     )
   }

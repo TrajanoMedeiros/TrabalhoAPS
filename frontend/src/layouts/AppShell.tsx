@@ -175,7 +175,7 @@ export function AppShell({
           )}
         </div>
 
-        <nav className="mt-6 grid gap-1.5" aria-label="Navegacao principal">
+        <nav className="mt-6 grid gap-1.5" aria-label="Navegação principal">
           {navItems.map((item) => (
             <NavButton
               key={item.key}
@@ -214,7 +214,7 @@ export function AppShell({
               <div className="flex min-w-0 items-center gap-1.5 min-[360px]:gap-2">
                 <div className="w-[4.25rem] shrink-0 rounded-2xl bg-slate-100 px-2 py-2 text-right min-[360px]:w-20 min-[420px]:w-24">
                   <p className="truncate text-[10px] font-extrabold uppercase text-slate-500">
-                    Periodo
+                    Período
                   </p>
                   <p className="truncate text-xs font-black text-slate-950 min-[420px]:text-sm">
                     {monthName(month)} {year}
@@ -251,7 +251,7 @@ export function AppShell({
                 </button>
               )}
               <div>
-                <p className="text-sm font-bold text-slate-500">Periodo selecionado</p>
+                <p className="text-sm font-bold text-slate-500">Período selecionado</p>
                 <h1 className="text-2xl font-black text-slate-950">
                   {monthName(month)} de {year}
                 </h1>
@@ -260,14 +260,14 @@ export function AppShell({
 
             <div className="hidden gap-2 xl:flex xl:flex-wrap xl:items-center xl:justify-end">
               <SelectInput
-                ariaLabel="Mes do periodo"
+                ariaLabel="Mês do período"
                 value={month}
                 onChange={onMonthChange}
                 className="min-h-11 sm:w-auto sm:min-w-28"
                 options={monthOptions}
               />
               <SelectInput
-                ariaLabel="Ano do periodo"
+                ariaLabel="Ano do período"
                 value={year}
                 onChange={onYearChange}
                 className="min-h-11 sm:w-auto sm:min-w-24"
@@ -298,13 +298,13 @@ export function AppShell({
             <div className="mx-auto grid w-full max-h-[calc(100vh-6rem)] max-w-md gap-3 overflow-y-auto rounded-[28px] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-950/15 ring-1 ring-slate-950/5">
               <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                 <SelectInput
-                  ariaLabel="Mes do periodo"
+                  ariaLabel="Mês do período"
                   value={month}
                   onChange={onMonthChange}
                   options={monthOptions}
                 />
                 <SelectInput
-                  ariaLabel="Ano do periodo"
+                  ariaLabel="Ano do período"
                   value={year}
                   onChange={onYearChange}
                   options={yearOptions}

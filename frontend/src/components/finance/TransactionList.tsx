@@ -20,8 +20,8 @@ export function TransactionList({
     return (
       <EmptyState>
         {compact
-          ? 'Sem lancamentos recentes. Adicione receitas e despesas para preencher este painel.'
-          : 'Nenhum lancamento no periodo. Registre um novo item para iniciar sua analise financeira.'}
+          ? 'Sem lançamentos recentes. Adicione receitas e despesas para preencher este painel.'
+          : 'Nenhum lançamento no período. Registre um novo item para iniciar sua análise financeira.'}
       </EmptyState>
     )
   }

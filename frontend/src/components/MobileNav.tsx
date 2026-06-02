@@ -11,7 +11,7 @@ export function MobileNav({
   return (
     <nav
       className="grid gap-1.5 xl:hidden"
-      aria-label="Navegacao principal"
+      aria-label="Navegação principal"
     >
       {navItems.map((item) => {
         const Icon = item.icon

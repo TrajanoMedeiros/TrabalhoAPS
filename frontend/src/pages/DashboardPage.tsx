@@ -66,8 +66,8 @@ export function DashboardPage({
           question="O que mudou?"
           answer={
             dashboard
-              ? `${Number(dashboard.taxa_economia).toFixed(1)}% de economia no periodo atual.`
-              : 'Registre movimentacoes para calcular variacao do periodo.'
+              ? `${Number(dashboard.taxa_economia).toFixed(1)}% de economia no período atual.`
+              : 'Registre movimentações para calcular variação do período.'
           }
         />
         <QuickInsightCard
@@ -79,7 +79,7 @@ export function DashboardPage({
           }
         />
         <QuickInsightCard
-          question="Minhas metas estao evoluindo?"
+          question="Minhas metas estão evoluindo?"
           answer={
             dashboard?.metas.total
               ? `${dashboard.metas.progresso_percentual.toFixed(1)}% de progresso agregado em ${dashboard.metas.total} metas.`
@@ -89,7 +89,7 @@ export function DashboardPage({
       </section>
 
       <section className="grid min-w-0 gap-5 xl:grid-cols-[1.35fr_0.65fr]">
-        <Panel title="Historico mensal">
+        <Panel title="Histórico mensal">
           <HistoryChart history={history} />
         </Panel>
 
@@ -112,7 +112,7 @@ export function DashboardPage({
               </div>
             </div>
           ) : (
-            <p className="text-slate-500">Registre movimentacoes para calcular seu score.</p>
+            <p className="text-slate-500">Registre movimentações para calcular seu score.</p>
           )}
         </Panel>
       </section>
@@ -124,7 +124,7 @@ export function DashboardPage({
         <Panel title="Receitas por categoria">
           <BarList items={dashboard?.distribuicao_receitas ?? []} tone="sky" />
         </Panel>
-        <Panel title="Lancamentos recentes">
+        <Panel title="Lançamentos recentes">
           <TransactionList
             transactions={transactions.slice(0, 6)}
             saving={saving}
@@ -136,26 +136,26 @@ export function DashboardPage({
 
       {(topIncome || topExpense) && (
         <section className="grid min-w-0 gap-4 lg:grid-cols-2">
-          <Panel title="Leitura rapida de categorias">
+          <Panel title="Leitura rápida de categorias">
             <div className="grid gap-3 text-sm text-slate-600">
               <p>
                 <span className="font-extrabold text-slate-900">Maior receita:</span>{' '}
                 {topIncome
                   ? `${topIncome.categoria} (${formatMoney(topIncome.total)})`
-                  : 'Sem dados no periodo.'}
+                  : 'Sem dados no período.'}
               </p>
               <p>
                 <span className="font-extrabold text-slate-900">Maior despesa:</span>{' '}
                 {topExpense
                   ? `${topExpense.categoria} (${formatMoney(topExpense.total)})`
-                  : 'Sem dados no periodo.'}
+                  : 'Sem dados no período.'}
               </p>
             </div>
           </Panel>
-          <Panel title="Proximo melhor passo">
+          <Panel title="Próximo melhor passo">
             <p className="text-sm leading-6 text-slate-600">
               {score?.recomendacoes[0] ??
-                'Continue registrando receitas, despesas e metas para liberar recomendacoes personalizadas.'}
+                'Continue registrando receitas, despesas e metas para liberar recomendações personalizadas.'}
             </p>
           </Panel>
         </section>

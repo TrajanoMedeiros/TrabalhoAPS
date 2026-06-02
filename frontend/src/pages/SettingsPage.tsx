@@ -95,8 +95,8 @@ export function SettingsPage({
                 })
               }
               options={[
-                { value: 'personal', label: 'Pessoa fisica' },
-                { value: 'business', label: 'Negocio' },
+                { value: 'personal', label: 'Pessoa física' },
+                { value: 'business', label: 'Negócio' },
               ]}
             />
           </Field>
@@ -111,7 +111,7 @@ export function SettingsPage({
         </form>
       </Panel>
 
-      <Panel title="Seguranca">
+      <Panel title="Segurança">
         <form onSubmit={onPasswordSubmit} className="grid gap-4">
           <Field label="Senha atual">
             <input
@@ -151,7 +151,7 @@ export function SettingsPage({
         <form onSubmit={onCategorySubmit} className="grid gap-4">
           {isEditingCategory && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-              Edicao em andamento. Salve para persistir as alteracoes.
+              Edição em andamento. Salve para persistir as alterações.
             </div>
           )}
 
@@ -191,7 +191,7 @@ export function SettingsPage({
               ) : (
                 <Plus className="h-4 w-4" aria-hidden="true" />
               )}
-              {isEditingCategory ? 'Salvar alteracoes' : 'Criar categoria'}
+              {isEditingCategory ? 'Salvar alterações' : 'Criar categoria'}
             </Button>
             {isEditingCategory && (
               <Button type="button" variant="ghost" onClick={onCategoryEditCancel}>
@@ -257,7 +257,7 @@ export function SettingsPage({
             )}
           </div>
         ) : (
-          <EmptyState>As categorias padrao ja estao disponiveis para uso.</EmptyState>
+          <EmptyState>As categorias padrão já estão disponíveis para uso.</EmptyState>
         )}
       </Panel>
     </section>

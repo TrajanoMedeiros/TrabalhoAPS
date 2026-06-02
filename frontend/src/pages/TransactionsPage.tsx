@@ -57,11 +57,11 @@ export function TransactionsPage({
 
   return (
     <section className="grid min-w-0 gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
-      <Panel title={isEditing ? 'Editar lancamento' : 'Novo lancamento'}>
+      <Panel title={isEditing ? 'Editar lançamento' : 'Novo lançamento'}>
         <form onSubmit={onSubmit} className="grid gap-4">
           {isEditing && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-              Edicao em andamento. Salve para persistir as alteracoes.
+              Edição em andamento. Salve para persistir as alterações.
             </div>
           )}
 
@@ -105,7 +105,7 @@ export function TransactionsPage({
               <DateInput
                 required
                 value={transactionForm.data}
-                ariaLabel="Data do lancamento"
+                ariaLabel="Data do lançamento"
                 onChange={(data) => onTransactionFormChange({ ...transactionForm, data })}
               />
             </Field>
@@ -114,7 +114,7 @@ export function TransactionsPage({
           <Field label="Categoria">
             <SelectInput
               value={transactionForm.id_categoria}
-              ariaLabel="Categoria do lancamento"
+              ariaLabel="Categoria do lançamento"
               placeholder="Selecione"
               onChange={(id_categoria) =>
                 onTransactionFormChange({ ...transactionForm, id_categoria })
@@ -129,14 +129,14 @@ export function TransactionsPage({
             />
           </Field>
 
-          <Field label="Descricao">
+          <Field label="Descrição">
             <input
               value={transactionForm.descricao}
               onChange={(event) =>
                 onTransactionFormChange({ ...transactionForm, descricao: event.target.value })
               }
               className={inputClass}
-              placeholder="Ex.: mercado, salario, transporte"
+              placeholder="Ex.: mercado, salário, transporte"
             />
           </Field>
 
@@ -147,7 +147,7 @@ export function TransactionsPage({
               ) : (
                 <Plus className="h-4 w-4" aria-hidden="true" />
               )}
-              {isEditing ? 'Salvar alteracoes' : 'Salvar lancamento'}
+              {isEditing ? 'Salvar alterações' : 'Salvar lançamento'}
             </Button>
             {isEditing && (
               <Button type="button" variant="ghost" onClick={onCancelEdit}>
@@ -159,14 +159,14 @@ export function TransactionsPage({
         </form>
       </Panel>
 
-      <Panel title="Movimentacoes do periodo">
+      <Panel title="Movimentações do período">
         <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_auto]">
           <label className="relative block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por descricao, categoria ou valor"
+              placeholder="Buscar por descrição, categoria ou valor"
               className={`${inputClass} pl-9`}
             />
           </label>
