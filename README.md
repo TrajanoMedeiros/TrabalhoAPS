@@ -1,251 +1,99 @@
 # Saldoo
 
-Saldoo e uma aplicacao SaaS de gestao financeira pessoal. A plataforma permite registrar receitas, despesas, categorias e metas, acompanhar score financeiro e conversar com um assistente que usa os dados persistidos da conta autenticada.
+## Visão Geral
 
-## Stack
+O **Saldoo** é uma plataforma SaaS de gestão financeira pessoal desenvolvida para ajudar usuários a organizarem sua vida financeira de forma simples, centralizada e intuitiva.
 
-- Frontend: React, TypeScript, Vite, TailwindCSS e lucide-react.
-- Backend: Laravel, API REST, JWT stateless, Eloquent, migrations, seeders e testes feature.
-- Banco: PostgreSQL 16 em Docker, exposto localmente em `localhost:5436`.
-- Infra: Docker Compose centralizado em `docker/`.
-- IA: chatbot Python desacoplado em `ia/`, com motor local e integracao opcional com Gemini.
-- Orquestracao local: npm workspaces e scripts na raiz.
+A aplicação permite registrar receitas, despesas, categorias e metas financeiras, oferecendo uma visão consolidada da situação financeira do usuário por meio de dashboards, histórico de movimentações e indicadores de desempenho financeiro. Além disso, a plataforma conta com um assistente financeiro capaz de utilizar os dados persistidos da conta autenticada para fornecer orientações e contextualizar informações relevantes.
 
-## Estrutura Do Monorepo
+O projeto foi desenvolvido com foco em escalabilidade, organização de domínio, experiência do usuário e isolamento seguro de dados, seguindo uma arquitetura moderna baseada em frontend desacoplado, API REST, banco de dados relacional e um módulo de inteligência artificial independente.
 
-```text
-frontend/  Aplicacao web React + TypeScript + TailwindCSS
-backend/   API REST Laravel, dominio financeiro e persistencia
-docker/    Compose, runtime PHP e configuracao do PostgreSQL
-ia/        Assistente financeiro desacoplado
-README.md  Documentacao principal de onboarding
-```
+---
 
-A raiz tambem contem `package.json` e `package-lock.json` para permitir `npm run dev` a partir do monorepo. Frontend, backend, Docker e IA permanecem independentes e podem evoluir separadamente.
+## O Problema
 
-## Requisitos
+Muitas pessoas ainda controlam suas finanças utilizando planilhas, anotações dispersas ou aplicativos genéricos que não foram projetados especificamente para acompanhamento financeiro contínuo.
 
-- Node.js 22+
-- npm 10+
-- Docker e Docker Compose
-- PHP 8.4+ e Composer apenas para rodar o backend fora do container
-- Python 3.11+ apenas para executar o chatbot em `ia/`
+Essa abordagem normalmente gera problemas como:
 
-## Setup Rapido
+- Falta de visibilidade sobre receitas e despesas;
+- Dificuldade para acompanhar a evolução financeira ao longo do tempo;
+- Ausência de metas financeiras estruturadas;
+- Informações espalhadas em múltiplas ferramentas;
+- Pouca capacidade de análise e tomada de decisão baseada em dados;
+- Falta de acompanhamento consistente dos hábitos financeiros.
 
-```bash
-npm install
-cp backend/.env.example backend/.env
-npm run dev
-```
+Esses fatores dificultam o planejamento financeiro e aumentam a probabilidade de decisões tomadas sem uma visão clara da situação econômica pessoal.
 
-URLs locais:
+---
 
-```text
-Frontend:   http://localhost:5173
-Backend:    http://localhost:8000
-PostgreSQL: localhost:5436
-```
+## A Solução
 
-O comando `npm run dev` sobe o PostgreSQL, inicia o backend Laravel em container e inicia o frontend Vite com proxy para `/api`.
+O Saldoo foi criado para centralizar a gestão financeira em uma única plataforma, permitindo que o usuário acompanhe suas movimentações financeiras de forma organizada e consistente.
 
-## Execucao Separada
+A plataforma oferece recursos para:
 
-Frontend:
+- Registro e gerenciamento de receitas;
+- Registro e gerenciamento de despesas;
+- Organização financeira através de categorias;
+- Definição e acompanhamento de metas financeiras;
+- Visualização de indicadores e histórico financeiro;
+- Cálculo de score financeiro baseado nos dados cadastrados;
+- Assistente financeiro integrado capaz de utilizar os dados da conta para fornecer contexto e orientações.
 
-```bash
-cd frontend
-npm run dev
-```
+Ao concentrar todas as informações financeiras em um único ambiente, o sistema proporciona maior controle, organização e capacidade de análise para o usuário.
 
-Backend em container, a partir da raiz:
+---
 
-```bash
-npm run dev:backend
-```
+## Objetivos do Projeto
 
-Backend local, quando PHP e extensoes estiverem instalados:
+O Saldoo foi desenvolvido com os seguintes objetivos:
 
-```bash
-cd backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan serve --host=0.0.0.0 --port=8000
-```
+- Centralizar informações financeiras em um único sistema;
+- Facilitar o acompanhamento de receitas e despesas;
+- Incentivar melhores hábitos de organização financeira;
+- Fornecer indicadores que auxiliem a tomada de decisão;
+- Garantir isolamento seguro de dados entre usuários;
+- Demonstrar boas práticas de arquitetura full stack;
+- Permitir evolução contínua através de uma estrutura modular e escalável.
 
-Infraestrutura isolada:
+---
 
-```bash
-npm run dev:docker
-```
+## Principais Funcionalidades
 
-IA local:
+### Gestão Financeira
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r ia/requirements.txt
-python ia/chatbot.py
-```
+- Cadastro de receitas;
+- Cadastro de despesas;
+- Organização por categorias;
+- Histórico financeiro;
+- Dashboard consolidado.
 
-## Scripts Da Raiz
+### Metas Financeiras
 
-| Script | Descricao |
-| --- | --- |
-| `npm run dev` | Sobe Postgres, backend Laravel e frontend Vite. |
-| `npm run dev:frontend` | Inicia apenas o frontend em `5173`. |
-| `npm run dev:backend` | Inicia apenas o backend em container na porta `8000`. |
-| `npm run dev:docker` | Sobe apenas o PostgreSQL na porta `5436`. |
-| `npm run docker:down` | Derruba a stack Docker. |
-| `npm run build` | Executa build de producao do frontend. |
-| `npm run lint` | Executa ESLint do frontend e Pint do backend. |
-| `npm run test` | Executa a suite Laravel no container usando SQLite em memoria. |
+- Criação de metas;
+- Acompanhamento de progresso;
+- Visualização de objetivos financeiros.
 
-## Variaveis De Ambiente
+### Score Financeiro
 
-O backend usa `backend/.env`. Para desenvolvimento, copie `backend/.env.example`.
+- Avaliação da saúde financeira baseada nos dados cadastrados;
+- Indicadores para acompanhamento da evolução financeira.
 
-| Variavel | Uso | Padrao local |
-| --- | --- | --- |
-| `APP_URL` | URL publica da API | `http://localhost:8000` |
-| `FRONTEND_URL` | Origem esperada do frontend | `http://localhost:5173` |
-| `DB_CONNECTION` | Driver do banco | `pgsql` |
-| `DB_HOST` | Host do banco fora do container | `127.0.0.1` |
-| `DB_PORT` | Porta local do PostgreSQL | `5436` |
-| `DB_DATABASE` | Nome do banco | `saldoo` |
-| `DB_USERNAME` | Usuario do banco | `saldoo` |
-| `DB_PASSWORD` | Senha do banco | `saldoo` |
-| `JWT_SECRET` | Segredo dos tokens JWT | trocar antes de producao |
-| `JWT_TTL_SECONDS` | Duracao do token | `86400` |
+### Assistente Financeiro
 
-Dentro do Docker, o Compose sobrescreve `DB_HOST=postgres` e `DB_PORT=5432`.
+- Consulta contextualizada utilizando dados da conta autenticada;
+- Recomendações e orientações baseadas nas informações persistidas.
 
-Variaveis opcionais da IA:
+### Gestão de Usuários
 
-| Variavel | Uso |
-| --- | --- |
-| `SALDOO_API_URL` | URL da API usada pelo chatbot. Padrao: `http://127.0.0.1:8000`. |
-| `SALDOO_API_TOKEN` | Token JWT usado para carregar dashboard e score. |
-| `GEMINI_API_KEY` | Ativa resposta generativa opcional. |
-| `GEMINI_MODEL` | Modelo Gemini opcional. Padrao: `gemini-2.5-flash`. |
+- Cadastro de usuários;
+- Autenticação via JWT;
+- Alteração de perfil;
+- Alteração de senha;
+- Controle de acesso por permissões.
 
-## Usuarios Seedados
+### Administração
 
-Ao executar `php artisan migrate --seed` ou `npm run dev`, o banco cria usuarios funcionais:
-
-| Papel | Email | Senha |
-| --- | --- | --- |
-| Administrador Saldoo | `admin@saldoo.com` | `Admin@2026` |
-| Carlos Henrique Silva | `carlos.silva@saldoo.com` | `User@2026` |
-
-O administrador acessa `/api/admin/overview`. Usuarios comuns recebem `403` nessa rota.
-
-## Arquitetura
-
-### Frontend
-
-O frontend fica em `frontend/src` com responsabilidades separadas:
-
-```text
-components/  Componentes reutilizaveis e componentes financeiros
-layouts/     Estrutura de navegacao e shell autenticado
-pages/       Telas de autenticacao, dashboard, lancamentos, metas, assistente e ajustes
-modules/     Fluxos por dominio: auth, finance, settings e assistant
-hooks/       Orquestracao de estado de alto nivel
-stores/      Estado inicial e constantes de UI
-services/    Cliente HTTP e tratamento de erro
-types/       Contratos TypeScript da API
-utils/       Formatadores e helpers puros
-routes/      Configuracao de navegacao
-styles/      Tokens visuais
-```
-
-A UI evita informacoes tecnicas para o usuario final, usa estados de loading, erro e vazio, labels em formularios, navegacao responsiva e componentes consistentes.
-
-### Backend
-
-O backend segue Laravel com separacao por responsabilidade:
-
-```text
-app/Http/Controllers/Api/  Controllers REST finos
-app/Http/Requests/         Validacoes de entrada
-app/Http/Resources/        Serializacao padronizada
-app/Actions/               Casos de uso de escrita
-app/DTOs/                  Dados validados entre camadas
-app/Repositories/          Consultas e persistencia especifica
-app/Services/              Respostas, JWT, score, dashboard e chat
-app/Models/                Modelos Eloquent e relacionamentos
-app/Modules/Finance/       Marcador do dominio financeiro
-database/migrations/       Schema, constraints e indices
-database/seeders/          Categorias e usuarios iniciais
-tests/Feature/             Fluxos integrados de API
-```
-
-Controllers nao carregam regras financeiras de escrita: validacao entra por Requests, dados seguem em DTOs, Actions executam casos de uso e Repositories concentram persistencia especifica.
-
-### IA
-
-O diretorio `ia/` contem um assistente desacoplado. Sem `GEMINI_API_KEY`, ele usa recomendacoes locais deterministicas. Com `SALDOO_API_TOKEN`, ele consulta dashboard e score da API para contextualizar as respostas.
-
-## Endpoints Principais
-
-| Metodo | Rota | Descricao |
-| --- | --- | --- |
-| `GET` | `/api/health` | Status da API |
-| `POST` | `/api/auth/register` | Cadastro |
-| `POST` | `/api/auth/login` | Login |
-| `GET` | `/api/auth/me` | Usuario autenticado |
-| `GET/PUT/DELETE` | `/api/users/me` | Perfil do usuario |
-| `PUT` | `/api/users/password` | Alteracao de senha |
-| `GET/POST` | `/api/categories` | Categorias |
-| `GET/POST` | `/api/incomes` | Receitas |
-| `GET/POST` | `/api/expenses` | Despesas |
-| `GET/POST` | `/api/goals` | Metas |
-| `GET` | `/api/dashboard` | Resumo financeiro |
-| `GET` | `/api/dashboard/history` | Historico mensal |
-| `GET` | `/api/score` | Score financeiro |
-| `POST` | `/api/chat` | Assistente financeiro |
-| `GET` | `/api/admin/overview` | Visao administrativa protegida |
-
-Receitas, despesas e dashboard aceitam filtros:
-
-```text
-?mes=5&ano=2026
-```
-
-## Qualidade E Validacao
-
-Antes de abrir PR, rode:
-
-```bash
-npm run lint
-npm run build
-npm run test
-```
-
-A suite automatizada usa SQLite em memoria para nao alterar o PostgreSQL local de desenvolvimento.
-
-Fluxos que devem ser conferidos no navegador:
-
-- login com usuario seedado
-- cadastro de novo usuario
-- persistencia do token apos reload
-- criacao e remocao de receita
-- criacao e remocao de despesa
-- criacao e progresso de meta
-- dashboard, historico e score
-- assistente autenticado
-- ajustes de perfil, senha e categorias
-- layout mobile, tablet e desktop
-
-## Decisoes Tecnicas
-
-- Monorepo simples, com npm workspaces apenas onde agrega clareza.
-- Backend roda em container por padrao para evitar divergencia de extensoes PHP locais.
-- PostgreSQL fica isolado em `docker/` com volume persistente, healthcheck e porta local `5436`.
-- JWT mantem a API stateless e simplifica a integracao frontend/backend.
-- Escritas financeiras usam Requests, DTOs, Actions e Repositories para manter controllers pequenos.
-- Frontend separa UI, fluxos de dominio, estado inicial, services e tipos para facilitar manutencao.
-- A IA fica desacoplada para evoluir sem acoplar dependencias generativas ao produto principal.
+- Visão consolidada para administradores;
+- Monitoramento geral da plataforma.
