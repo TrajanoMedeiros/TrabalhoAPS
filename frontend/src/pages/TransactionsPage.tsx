@@ -56,7 +56,7 @@ export function TransactionsPage({
   }, [kindFilter, query, transactions])
 
   return (
-    <section className="grid min-w-0 gap-5 xl:grid-cols-[0.78fr_1.22fr]">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
       <Panel title={isEditing ? 'Editar lancamento' : 'Novo lancamento'}>
         <form onSubmit={onSubmit} className="grid gap-4">
           {isEditing && (

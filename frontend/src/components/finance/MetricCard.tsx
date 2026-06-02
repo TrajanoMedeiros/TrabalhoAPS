@@ -9,11 +9,11 @@ export function MetricCard({
   label: string
   value: string
   icon: LucideIcon
-  tone: 'emerald' | 'blue' | 'rose' | 'amber'
+  tone: 'sky' | 'blue' | 'rose' | 'amber'
 }) {
   const tones = {
-    emerald: 'bg-sky-50 text-sky-700',
-    blue: 'bg-indigo-50 text-indigo-700',
+    sky: 'bg-sky-50 text-sky-700',
+    blue: 'bg-blue-50 text-blue-700',
     rose: 'bg-rose-50 text-rose-700',
     amber: 'bg-amber-50 text-amber-700',
   }

@@ -157,17 +157,17 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-[#f7f9fc] text-slate-950">
       <aside
-        className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200 bg-white px-3 py-5 transition-[width,padding] duration-300 xl:flex ${
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col overflow-visible border-r border-slate-200 bg-white px-2.5 py-4 transition-[width,padding] duration-300 xl:flex ${
           sidebarCollapsed ? 'w-20' : 'w-64'
         }`}
       >
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-3 px-1">
           <Brand compact={sidebarCollapsed} />
           <button
             type="button"
             aria-label={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
             onClick={toggleSidebar}
-            className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
           >
             {sidebarCollapsed ? (
               <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
@@ -177,7 +177,7 @@ export function AppShell({
           </button>
         </div>
 
-        <nav className="mt-8 grid gap-2" aria-label="Navegacao principal">
+        <nav className="mt-6 grid gap-1.5" aria-label="Navegacao principal">
           {navItems.map((item) => (
             <NavButton
               key={item.key}

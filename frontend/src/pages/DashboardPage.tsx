@@ -35,7 +35,7 @@ export function DashboardPage({
           label="Saldo"
           value={formatMoney(dashboard?.saldo_atual ?? 0)}
           icon={WalletCards}
-          tone="emerald"
+          tone="sky"
         />
         <MetricCard
           label="Receitas"
@@ -122,7 +122,7 @@ export function DashboardPage({
           <BarList items={dashboard?.distribuicao_gastos ?? []} tone="rose" />
         </Panel>
         <Panel title="Receitas por categoria">
-          <BarList items={dashboard?.distribuicao_receitas ?? []} tone="emerald" />
+          <BarList items={dashboard?.distribuicao_receitas ?? []} tone="sky" />
         </Panel>
         <Panel title="Lancamentos recentes">
           <TransactionList
