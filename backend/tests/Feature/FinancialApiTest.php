@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Expense;
+use App\Models\Category;
+use App\Models\FinancialGoal;
 use App\Models\Income;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -246,25 +248,41 @@ class FinancialApiTest extends TestCase
             ]);
     }
 
-    public function test_seeded_user_has_demo_financial_dataset_until_current_month(): void
+    public function test_seeded_user_has_demo_financial_dataset_until_june_2026(): void
     {
         $this->seed();
 
         $user = User::query()->where('email', 'carlos.silva@saldoo.com')->firstOrFail();
+        $categoryNames = Category::query()
+            ->whereNull('user_id')
+            ->pluck('name')
+            ->all();
         $firstIncome = Income::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
         $firstExpense = Expense::query()->where('user_id', $user->id)->oldest('occurred_on')->first();
         $lastIncome = Income::query()->where('user_id', $user->id)->latest('occurred_on')->first();
         $lastExpense = Expense::query()->where('user_id', $user->id)->latest('occurred_on')->first();
+        $goals = FinancialGoal::query()->where('user_id', $user->id)->pluck('title')->all();
 
         $this->assertNotNull($firstIncome);
         $this->assertNotNull($firstExpense);
         $this->assertNotNull($lastIncome);
         $this->assertNotNull($lastExpense);
+        $this->assertSame(4, FinancialGoal::query()->where('user_id', $user->id)->count());
+        $this->assertTrue(in_array('Assinaturas', $categoryNames, true));
+        $this->assertEqualsCanonicalizing(
+            [
+                'Reserva de emergencia',
+                'Troca de notebook',
+                'Viagem para o Nordeste',
+                'Entrada do apartamento',
+            ],
+            $goals,
+        );
 
         $this->assertTrue($firstIncome->occurred_on->format('Y-m') === '2025-01');
         $this->assertTrue($firstExpense->occurred_on->format('Y-m') === '2025-01');
-        $this->assertTrue($lastIncome->occurred_on->format('Y-m') === now()->format('Y-m'));
-        $this->assertTrue($lastExpense->occurred_on->format('Y-m') === now()->format('Y-m'));
+        $this->assertTrue($lastIncome->occurred_on->format('Y-m') === '2026-06');
+        $this->assertTrue($lastExpense->occurred_on->format('Y-m') === '2026-06');
     }
 
     public function test_seeded_user_core_endpoints_are_accessible_without_runtime_errors(): void
