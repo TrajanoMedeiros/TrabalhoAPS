@@ -161,20 +161,18 @@ export function AppShell({
           sidebarCollapsed ? 'w-20' : 'w-64'
         }`}
       >
-        <div className="flex items-center justify-between gap-3 px-1">
+        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'justify-between gap-3 px-1'}`}>
           <Brand compact={sidebarCollapsed} />
-          <button
-            type="button"
-            aria-label={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
-            onClick={toggleSidebar}
-            className="grid h-10 w-10 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
-          >
-            {sidebarCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
-            ) : (
+          {!sidebarCollapsed && (
+            <button
+              type="button"
+              aria-label="Recolher sidebar"
+              onClick={toggleSidebar}
+              className="grid h-10 w-10 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+            >
               <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
-            )}
-          </button>
+            </button>
+          )}
         </div>
 
         <nav className="mt-6 grid gap-1.5" aria-label="Navegacao principal">
@@ -241,11 +239,23 @@ export function AppShell({
               </div>
             </div>
 
-            <div className="hidden xl:block">
+            <div className="hidden items-center gap-3 xl:flex">
+              {sidebarCollapsed && (
+                <button
+                  type="button"
+                  aria-label="Expandir sidebar"
+                  onClick={toggleSidebar}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+                >
+                  <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+                </button>
+              )}
+              <div>
                 <p className="text-sm font-bold text-slate-500">Periodo selecionado</p>
                 <h1 className="text-2xl font-black text-slate-950">
                   {monthName(month)} de {year}
                 </h1>
+              </div>
             </div>
 
             <div className="hidden gap-2 xl:flex xl:flex-wrap xl:items-center xl:justify-end">
