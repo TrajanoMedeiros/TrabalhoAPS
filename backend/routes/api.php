@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\AIController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\ScoreController;
@@ -48,7 +48,7 @@ Route::middleware('auth.jwt')->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'summary']);
     Route::get('/dashboard/history', [DashboardController::class, 'history']);
     Route::get('/score', [ScoreController::class, 'show']);
-    Route::post('/chat', [ChatController::class, 'ask']);
+    Route::post('/chat', [AIController::class, 'ask']);
 
     Route::middleware('admin')->prefix('admin')->group(function (): void {
         Route::get('/overview', [AdminController::class, 'overview']);

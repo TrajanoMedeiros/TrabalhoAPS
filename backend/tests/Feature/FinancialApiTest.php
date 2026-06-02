@@ -338,4 +338,26 @@ class FinancialApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.chat.resposta', fn ($value) => is_string($value) && mb_strlen($value) > 0);
     }
+
+    public function test_chat_returns_friendly_fallback_when_provider_is_missing(): void
+    {
+        $this->seed();
+
+        config()->set('services.ai.endpoint', null);
+        config()->set('services.ai.token', null);
+
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'carlos.silva@saldoo.com',
+            'senha' => 'User@2026',
+        ])->assertOk()
+            ->json('data.token');
+
+        $this->withToken($token)
+            ->postJson('/api/chat', ['mensagem' => 'Como melhorar meu score?'])
+            ->assertOk()
+            ->assertJsonPath(
+                'data.chat.resposta',
+                'Assistente temporariamente indisponível. Verifique a configuração da API.',
+            );
+    }
 }

@@ -132,7 +132,7 @@ Centralizam consultas e persistência específica do domínio.
 
 ### Services
 
-Implementam serviços compartilhados como autenticação, dashboard, score financeiro e assistente.
+Implementam serviços compartilhados como autenticação, dashboard, score financeiro e assistente, incluindo a camada `AIService` com `ContextBuilder`, `PromptBuilder`, `ProviderAdapter` e `FallbackProvider`.
 
 ### Models
 
@@ -201,7 +201,7 @@ O projeto adota mecanismos para garantir estabilidade e confiabilidade:
 * Isolamento de regras de negócio;
 * Persistência desacoplada da camada HTTP.
 
-Os testes utilizam SQLite em memória para evitar impactos no banco PostgreSQL utilizado durante o desenvolvimento.
+Os testes automatizados rodam contra o PostgreSQL do ambiente de desenvolvimento Docker, mantendo o mesmo banco usado na aplicação e evitando divergencias de comportamento entre ambientes.
 
 ---
 

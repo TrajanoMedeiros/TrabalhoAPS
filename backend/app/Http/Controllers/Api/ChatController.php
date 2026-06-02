@@ -2,50 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\ApiResponse;
-use App\Services\ChatAdvisorService;
-use App\Services\FinancialSummaryService;
-use App\Services\ScoreService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Throwable;
-
-class ChatController extends Controller
+class ChatController extends AIController
 {
-    public function __construct(
-        private readonly ChatAdvisorService $advisor,
-        private readonly FinancialSummaryService $summary,
-        private readonly ScoreService $score,
-    ) {}
-
-    public function ask(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'mensagem' => ['required', 'string', 'min:3', 'max:600'],
-        ]);
-        $user = $this->authenticatedUser($request);
-
-        $dashboard = [];
-        $score = [];
-
-        try {
-            $dashboard = $this->summary->summary($user);
-            $score = $this->score->calculate($user);
-        } catch (Throwable $exception) {
-            report($exception);
-        }
-
-        $chat = $this->advisor->fallback($dashboard, $score);
-
-        try {
-            $chat = $this->advisor->answer($data['mensagem'], $dashboard, $score);
-        } catch (Throwable $exception) {
-            report($exception);
-        }
-
-        return ApiResponse::success([
-            'chat' => $chat,
-        ]);
-    }
 }

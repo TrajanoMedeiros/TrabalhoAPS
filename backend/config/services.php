@@ -40,4 +40,13 @@ return [
         'ttl' => env('JWT_TTL_SECONDS', 86400),
     ],
 
+    'ai' => [
+        'provider' => env('AI_PROVIDER'),
+        'endpoint' => env('AI_PROVIDER_ENDPOINT'),
+        'token' => env('AI_PROVIDER_TOKEN'),
+        'model' => env('AI_PROVIDER_MODEL', 'gemini-2.5-flash'),
+        'timeout' => env('AI_PROVIDER_TIMEOUT', 8),
+        'requires_auth' => env('AI_PROVIDER_REQUIRES_AUTH', true),
+    ],
+
 ];
