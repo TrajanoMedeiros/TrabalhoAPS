@@ -33,7 +33,7 @@ export function TransactionList({
         return (
           <article
             key={`${transaction.kind}-${transaction.id}`}
-            className="grid gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50 sm:flex sm:items-center sm:justify-between"
+            className="grid min-w-0 gap-3 rounded-2xl border-b border-slate-100 p-2 transition duration-200 last:border-0 hover:bg-slate-50 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
           >
             <div className="flex min-w-0 items-center gap-3">
               <div
@@ -56,9 +56,9 @@ export function TransactionList({
                 </p>
               </div>
             </div>
-            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
+            <div className="flex min-w-0 items-center gap-2 justify-self-start sm:justify-self-end">
               <p
-                className={`text-sm font-black sm:text-right ${
+                className={`shrink-0 whitespace-nowrap text-sm font-black ${
                   isIncome ? 'text-sky-700' : 'text-rose-700'
                 }`}
               >
