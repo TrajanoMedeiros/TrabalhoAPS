@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -48,7 +49,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@saldoo.com'],
             [
                 'name' => 'Administrador Saldoo',
-                'password' => 'Admin@2026',
+                'password' => Hash::make('Admin@2026'),
                 'account_type' => 'business',
                 'role' => User::ROLE_ADMIN,
             ],
@@ -58,7 +59,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'carlos.silva@saldoo.com'],
             [
                 'name' => 'Carlos Henrique Silva',
-                'password' => 'User@2026',
+                'password' => Hash::make('User@2026'),
                 'account_type' => 'personal',
                 'role' => User::ROLE_USER,
             ],

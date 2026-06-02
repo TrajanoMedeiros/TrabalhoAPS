@@ -18,16 +18,22 @@ class AuthController extends Controller
 
     public function register(Request $request): JsonResponse
     {
+        $request->merge([
+            'email' => mb_strtolower((string) $request->input('email')),
+        ]);
+
         $data = $request->validate([
             'nome' => ['required', 'string', 'min:2', 'max:120'],
             'email' => ['required', 'email', 'max:180', 'unique:users,email'],
             'senha' => ['required', 'string', 'min:8', 'max:255'],
             'tipo_usuario' => ['nullable', 'in:personal,business'],
+        ], [
+            'email.unique' => 'Este e-mail já está em uso.',
         ]);
 
         $user = User::query()->create([
             'name' => $data['nome'],
-            'email' => mb_strtolower($data['email']),
+            'email' => $data['email'],
             'password' => $data['senha'],
             'account_type' => $data['tipo_usuario'] ?? 'personal',
             'role' => User::ROLE_USER,

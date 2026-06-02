@@ -6,6 +6,13 @@ export function getErrorMessage(
 ): string {
   if (error instanceof ApiError) {
     const firstFieldError = Object.values(error.details ?? {})[0]?.[0]
+    if (typeof firstFieldError === 'string' && firstFieldError.startsWith('validation.')) {
+      if (firstFieldError === 'validation.unique') {
+        return 'Este e-mail já está em uso.'
+      }
+
+      return 'Revise os campos informados.'
+    }
     return firstFieldError ?? error.message
   }
 

@@ -248,6 +248,20 @@ class FinancialApiTest extends TestCase
             ]);
     }
 
+    public function test_registering_with_duplicate_email_shows_friendly_message(): void
+    {
+        $this->seed();
+
+        $this->postJson('/api/auth/register', [
+            'nome' => 'Outro Usuario',
+            'email' => 'carlos.silva@saldoo.com',
+            'senha' => 'Senha12345',
+            'tipo_usuario' => 'personal',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('error.details.email.0', 'Este e-mail já está em uso.');
+    }
+
     public function test_seeded_user_has_demo_financial_dataset_until_june_2026(): void
     {
         $this->seed();
