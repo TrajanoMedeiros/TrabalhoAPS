@@ -1,0 +1,44 @@
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/php/Dockerfile
+    container_name: saldoo_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../backend:/var/www/html
+    command: >
+      sh -c "composer install --no-interaction
+      && if [ -z \"$$APP_KEY\" ]; then php artisan key:generate --force; fi
+      && php artisan migrate --force
+      && php artisan db:seed --force
+      && php -S 0.0.0.0:8000 -t public public/index.php"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: saldoo_postgres
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: saldoo
+      POSTGRES_USER: saldoo
+      POSTGRES_PASSWORD: saldoo
+    volumes:
+      - saldoo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saldoo -d saldoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  saldoo_postgres_data:

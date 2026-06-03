@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use App\Services\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+
+class UserController extends Controller
+{
+    public function show(Request $request): JsonResponse
+    {
+        return ApiResponse::success(['user' => $this->presentUser($this->authenticatedUser($request))]);
+    }
+
+    public function update(Request $request): JsonResponse
+    {
+        $user = $this->authenticatedUser($request);
+        $data = $request->validate([
+            'nome' => ['sometimes', 'required', 'string', 'min:2', 'max:120'],
+            'email' => ['sometimes', 'required', 'email', 'max:180', Rule::unique('users', 'email')->ignore($user->id)],
+            'tipo_usuario' => ['sometimes', 'required', 'in:personal,business'],
+        ]);
+
+        if (array_key_exists('nome', $data)) {
+            $user->name = $data['nome'];
+        }
+        if (array_key_exists('email', $data)) {
+            $user->email = mb_strtolower($data['email']);
+        }
+        if (array_key_exists('tipo_usuario', $data)) {
+            $user->account_type = $data['tipo_usuario'];
+        }
+
+        $user->save();
+
+        return ApiResponse::success(['user' => $this->presentUser($user)], 'Perfil atualizado com sucesso.');
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'senha_atual' => ['required', 'string'],
+            'nova_senha' => ['required', 'string', 'min:8', 'max:255'],
+        ]);
+
+        $user = $this->authenticatedUser($request);
+        if (! Hash::check($data['senha_atual'], $user->password)) {
+            throw ValidationException::withMessages([
+                'senha_atual' => 'Senha atual incorreta.',
+            ]);
+        }
+
+        $user->password = $data['nova_senha'];
+        $user->save();
+
+        return ApiResponse::success([], 'Senha atualizada com sucesso.');
+    }
+
+    public function destroy(Request $request): JsonResponse
+    {
+        $this->authenticatedUser($request)->delete();
+
+        return ApiResponse::success([], 'Conta removida com sucesso.');
+    }
+
+    private function presentUser(User $user): array
+    {
+        return UserResource::make($user);
+    }
+}

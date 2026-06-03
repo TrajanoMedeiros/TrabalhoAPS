@@ -1,0 +1,354 @@
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  CalendarDays,
+  CheckCircle2,
+  Loader2,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ShieldCheck,
+  X,
+} from 'lucide-react'
+import { Alert } from '../components/Alert'
+import { Brand } from '../components/Brand'
+import { SelectInput } from '../components/form/SelectInput'
+import { MobileNav } from '../components/MobileNav'
+import { NavButton } from '../components/NavButton'
+import { PageTitle } from '../components/PageTitle'
+import { Button } from '../components/ui'
+import { navItems } from '../routes/navigation'
+import type { User, View } from '../types'
+import { monthName } from '../utils/format'
+
+const sidebarStorageKey = 'saldoo.layout.sidebar-collapsed'
+
+export function AppShell({
+  activeView,
+  user,
+  month,
+  year,
+  years,
+  loading,
+  error,
+  notice,
+  children,
+  onMonthChange,
+  onYearChange,
+  onRefresh,
+  onLogout,
+  onViewChange,
+}: {
+  activeView: View
+  user: User | null
+  month: number
+  year: number
+  years: number[]
+  loading: boolean
+  error: string | null
+  notice: string | null
+  children: ReactNode
+  onMonthChange: (month: number) => void
+  onYearChange: (year: number) => void
+  onRefresh: () => void
+  onLogout: () => void
+  onViewChange: (view: View) => void
+}) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem(sidebarStorageKey) === '1'
+  })
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false)
+  const lastScrollRef = useRef(0)
+  const mobileMenuOpenRef = useRef(false)
+  const monthOptions = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, index) => index + 1).map((option) => ({
+        value: option,
+        label: monthName(option),
+      })),
+    [],
+  )
+  const yearOptions = useMemo(
+    () =>
+      years.map((option) => ({
+        value: option,
+        label: String(option),
+      })),
+    [years],
+  )
+
+  useEffect(() => {
+    mobileMenuOpenRef.current = mobileMenuOpen
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY
+      const delta = currentScroll - lastScrollRef.current
+
+      if (mobileMenuOpenRef.current) {
+        setMobileHeaderHidden(false)
+        lastScrollRef.current = currentScroll
+        return
+      }
+
+      if (window.innerWidth >= 1280 || currentScroll < 24) {
+        setMobileHeaderHidden(false)
+        lastScrollRef.current = currentScroll
+        return
+      }
+
+      if (delta > 8 && currentScroll > 96) setMobileHeaderHidden(true)
+      if (delta < -8) setMobileHeaderHidden(false)
+      lastScrollRef.current = currentScroll
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false)
+    }
+
+    document.addEventListener('keydown', closeOnEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    const closeOnDesktop = () => {
+      if (window.innerWidth >= 1280 && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+        setMobileHeaderHidden(false)
+      }
+    }
+
+    window.addEventListener('resize', closeOnDesktop)
+    return () => window.removeEventListener('resize', closeOnDesktop)
+  }, [mobileMenuOpen])
+
+  function handleMobileViewChange(view: View) {
+    onViewChange(view)
+    setMobileMenuOpen(false)
+    setMobileHeaderHidden(false)
+  }
+
+  function toggleSidebar() {
+    setSidebarCollapsed((current) => {
+      const next = !current
+      window.localStorage.setItem(sidebarStorageKey, next ? '1' : '0')
+      return next
+    })
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f7f9fc] text-slate-950">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col overflow-visible border-r border-slate-200 bg-white px-2.5 py-4 transition-[width,padding] duration-300 xl:flex ${
+          sidebarCollapsed ? 'w-20' : 'w-64'
+        }`}
+      >
+        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'justify-between gap-3 px-1'}`}>
+          <Brand compact={sidebarCollapsed} />
+          {!sidebarCollapsed && (
+            <button
+              type="button"
+              aria-label="Recolher sidebar"
+              onClick={toggleSidebar}
+              className="grid h-10 w-10 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+            >
+              <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        <nav className="mt-6 grid gap-1.5" aria-label="Navegação principal">
+          {navItems.map((item) => (
+            <NavButton
+              key={item.key}
+              item={item}
+              active={activeView === item.key}
+              compact={sidebarCollapsed}
+              onClick={() => onViewChange(item.key)}
+            />
+          ))}
+        </nav>
+      </aside>
+
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Fechar menu"
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-20 bg-slate-950/35 backdrop-blur-[1px] xl:hidden"
+        />
+      )}
+
+      <div className={`relative transition-[padding] duration-300 ${sidebarCollapsed ? 'xl:pl-20' : 'xl:pl-64'}`}>
+        <header
+          className={`sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out xl:translate-y-0 ${
+            mobileHeaderHidden ? '-translate-y-full' : 'translate-y-0'
+          }`}
+        >
+          <div className="mx-auto grid max-w-7xl gap-3 px-4 py-3 sm:px-6 lg:flex lg:items-center lg:justify-between lg:px-8">
+            <div className="flex items-center justify-between gap-2 xl:hidden">
+              <div className="min-[360px]:hidden">
+                <Brand compact />
+              </div>
+              <div className="hidden min-[360px]:block">
+                <Brand />
+              </div>
+              <div className="flex min-w-0 items-center gap-1.5 min-[360px]:gap-2">
+                <div className="w-[4.25rem] shrink-0 rounded-2xl bg-slate-100 px-2 py-2 text-right min-[360px]:w-20 min-[420px]:w-24">
+                  <p className="truncate text-[10px] font-extrabold uppercase text-slate-500">
+                    Período
+                  </p>
+                  <p className="truncate text-xs font-black text-slate-950 min-[420px]:text-sm">
+                    {monthName(month)} {year}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+                  aria-expanded={mobileMenuOpen}
+                  onClick={() => {
+                    setMobileHeaderHidden(false)
+                    setMobileMenuOpen((current) => !current)
+                  }}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white shadow-sm transition duration-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 active:scale-95 min-[360px]:h-12 min-[360px]:w-12"
+                >
+                  {mobileMenuOpen ? (
+                    <X className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Menu className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden items-center gap-3 xl:flex">
+              {sidebarCollapsed && (
+                <button
+                  type="button"
+                  aria-label="Expandir sidebar"
+                  onClick={toggleSidebar}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+                >
+                  <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+                </button>
+              )}
+              <div>
+                <p className="text-sm font-bold text-slate-500">Período selecionado</p>
+                <h1 className="text-2xl font-black text-slate-950">
+                  {monthName(month)} de {year}
+                </h1>
+              </div>
+            </div>
+
+            <div className="hidden gap-2 xl:flex xl:flex-wrap xl:items-center xl:justify-end">
+              <SelectInput
+                ariaLabel="Mês do período"
+                value={month}
+                onChange={onMonthChange}
+                className="min-h-11 sm:w-auto sm:min-w-28"
+                options={monthOptions}
+              />
+              <SelectInput
+                ariaLabel="Ano do período"
+                value={year}
+                onChange={onYearChange}
+                className="min-h-11 sm:w-auto sm:min-w-24"
+                options={yearOptions}
+              />
+              <Button variant="ghost" onClick={onRefresh} disabled={loading} className="min-h-11">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                )}
+                Atualizar
+              </Button>
+              <Button variant="danger" onClick={onLogout} className="min-h-11">
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sair
+              </Button>
+            </div>
+          </div>
+
+          <div
+            className={`absolute left-0 right-0 top-full z-40 px-4 transition duration-300 ease-out sm:px-6 xl:hidden ${
+              mobileMenuOpen
+                ? 'pointer-events-auto translate-y-2 opacity-100'
+                : 'pointer-events-none -translate-y-2 opacity-0'
+            }`}
+          >
+            <div className="mx-auto grid w-full max-h-[calc(100vh-6rem)] max-w-md gap-3 overflow-y-auto rounded-[28px] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-950/15 ring-1 ring-slate-950/5">
+              <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+                <SelectInput
+                  ariaLabel="Mês do período"
+                  value={month}
+                  onChange={onMonthChange}
+                  options={monthOptions}
+                />
+                <SelectInput
+                  ariaLabel="Ano do período"
+                  value={year}
+                  onChange={onYearChange}
+                  options={yearOptions}
+                />
+                <Button
+                  variant="ghost"
+                  onClick={onRefresh}
+                  disabled={loading}
+                  className="min-h-11"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  Atualizar
+                </Button>
+                <Button variant="danger" onClick={onLogout} className="min-h-11">
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  Sair
+                </Button>
+              </div>
+              <MobileNav activeView={activeView} onViewChange={handleMobileViewChange} />
+            </div>
+          </div>
+        </header>
+
+        <main className="surface-enter mx-auto grid w-full min-w-0 max-w-7xl gap-5 overflow-x-hidden px-4 py-5 sm:px-6 lg:px-8">
+          <PageTitle activeView={activeView} user={user} />
+
+          {error && (
+            <Alert tone="error" icon={ShieldCheck}>
+              {error}
+            </Alert>
+          )}
+          {notice && (
+            <Alert tone="success" icon={CheckCircle2}>
+              {notice}
+            </Alert>
+          )}
+
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}
