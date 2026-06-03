@@ -1,99 +1,99 @@
 # Saldoo
 
-## Visão Geral
+## Overview
 
-O **Saldoo** é uma plataforma SaaS de gestão financeira pessoal desenvolvida para ajudar usuários a organizarem sua vida financeira de forma simples, centralizada e intuitiva.
+**Saldoo** is a personal finance management SaaS platform designed to help users organize their financial lives in a simple, centralized, and intuitive way.
 
-A aplicação permite registrar receitas, despesas, categorias e metas financeiras, oferecendo uma visão consolidada da situação financeira do usuário por meio de dashboards, histórico de movimentações e indicadores de desempenho financeiro. Além disso, a plataforma conta com um assistente financeiro capaz de utilizar os dados persistidos da conta autenticada para fornecer orientações e contextualizar informações relevantes.
+The application allows users to manage income, expenses, categories, and financial goals, providing a consolidated view of their financial situation through dashboards, transaction history, and financial performance indicators. Additionally, the platform includes a financial assistant capable of leveraging persisted data from the authenticated account to provide guidance and contextualized financial insights.
 
-O projeto foi desenvolvido com foco em escalabilidade, organização de domínio, experiência do usuário e isolamento seguro de dados, seguindo uma arquitetura moderna baseada em frontend desacoplado, API REST, banco de dados relacional e um módulo de inteligência artificial independente.
-
----
-
-## O Problema
-
-Muitas pessoas ainda controlam suas finanças utilizando planilhas, anotações dispersas ou aplicativos genéricos que não foram projetados especificamente para acompanhamento financeiro contínuo.
-
-Essa abordagem normalmente gera problemas como:
-
-- Falta de visibilidade sobre receitas e despesas;
-- Dificuldade para acompanhar a evolução financeira ao longo do tempo;
-- Ausência de metas financeiras estruturadas;
-- Informações espalhadas em múltiplas ferramentas;
-- Pouca capacidade de análise e tomada de decisão baseada em dados;
-- Falta de acompanhamento consistente dos hábitos financeiros.
-
-Esses fatores dificultam o planejamento financeiro e aumentam a probabilidade de decisões tomadas sem uma visão clara da situação econômica pessoal.
+The project was developed with a strong focus on scalability, domain organization, user experience, and secure data isolation, following a modern architecture based on a decoupled frontend, REST API, relational database, and an independent artificial intelligence module.
 
 ---
 
-## A Solução
+## The Problem
 
-O Saldoo foi criado para centralizar a gestão financeira em uma única plataforma, permitindo que o usuário acompanhe suas movimentações financeiras de forma organizada e consistente.
+Many people still manage their finances using spreadsheets, scattered notes, or generic applications that were not specifically designed for continuous financial tracking.
 
-A plataforma oferece recursos para:
+This approach often leads to problems such as:
 
-- Registro e gerenciamento de receitas;
-- Registro e gerenciamento de despesas;
-- Organização financeira através de categorias;
-- Definição e acompanhamento de metas financeiras;
-- Visualização de indicadores e histórico financeiro;
-- Cálculo de score financeiro baseado nos dados cadastrados;
-- Assistente financeiro integrado capaz de utilizar os dados da conta para fornecer contexto e orientações.
+* Lack of visibility into income and expenses;
+* Difficulty tracking financial progress over time;
+* Absence of structured financial goals;
+* Information scattered across multiple tools;
+* Limited ability to analyze data and make informed financial decisions;
+* Lack of consistent monitoring of financial habits.
 
-Ao concentrar todas as informações financeiras em um único ambiente, o sistema proporciona maior controle, organização e capacidade de análise para o usuário.
-
----
-
-## Objetivos do Projeto
-
-O Saldoo foi desenvolvido com os seguintes objetivos:
-
-- Centralizar informações financeiras em um único sistema;
-- Facilitar o acompanhamento de receitas e despesas;
-- Incentivar melhores hábitos de organização financeira;
-- Fornecer indicadores que auxiliem a tomada de decisão;
-- Garantir isolamento seguro de dados entre usuários;
-- Demonstrar boas práticas de arquitetura full stack;
-- Permitir evolução contínua através de uma estrutura modular e escalável.
+These factors make financial planning more difficult and increase the likelihood of making decisions without a clear understanding of one's personal financial situation.
 
 ---
 
-## Principais Funcionalidades
+## The Solution
 
-### Gestão Financeira
+Saldoo was created to centralize financial management within a single platform, enabling users to track their financial activities in an organized and consistent manner.
 
-- Cadastro de receitas;
-- Cadastro de despesas;
-- Organização por categorias;
-- Histórico financeiro;
-- Dashboard consolidado.
+The platform provides features for:
 
-### Metas Financeiras
+* Income tracking and management;
+* Expense tracking and management;
+* Financial organization through categories;
+* Creation and monitoring of financial goals;
+* Visualization of financial indicators and transaction history;
+* Financial score calculation based on registered data;
+* An integrated financial assistant capable of using account data to provide contextual insights and guidance.
 
-- Criação de metas;
-- Acompanhamento de progresso;
-- Visualização de objetivos financeiros.
+By consolidating all financial information into a single environment, the system offers users greater control, organization, and analytical capabilities.
 
-### Score Financeiro
+---
 
-- Avaliação da saúde financeira baseada nos dados cadastrados;
-- Indicadores para acompanhamento da evolução financeira.
+## Project Goals
 
-### Assistente Financeiro
+Saldoo was developed with the following objectives:
 
-- Consulta contextualizada utilizando dados da conta autenticada;
-- Recomendações e orientações baseadas nas informações persistidas.
+* Centralize financial information in a single system;
+* Simplify income and expense tracking;
+* Encourage better financial organization habits;
+* Provide indicators that support decision-making;
+* Ensure secure data isolation between users;
+* Demonstrate full-stack architecture best practices;
+* Enable continuous growth through a modular and scalable structure.
 
-### Gestão de Usuários
+---
 
-- Cadastro de usuários;
-- Autenticação via JWT;
-- Alteração de perfil;
-- Alteração de senha;
-- Controle de acesso por permissões.
+## Key Features
 
-### Administração
+### Financial Management
 
-- Visão consolidada para administradores;
-- Monitoramento geral da plataforma.
+* Income registration;
+* Expense registration;
+* Category-based organization;
+* Financial history;
+* Consolidated dashboard.
+
+### Financial Goals
+
+* Goal creation;
+* Progress tracking;
+* Financial objective visualization.
+
+### Financial Score
+
+* Financial health assessment based on registered data;
+* Indicators to monitor financial improvement over time.
+
+### Financial Assistant
+
+* Context-aware consultations using authenticated account data;
+* Recommendations and guidance based on persisted financial information.
+
+### User Management
+
+* User registration;
+* JWT-based authentication;
+* Profile management;
+* Password management;
+* Permission-based access control.
+
+### Administration
+
+* Consolidated administrative dashboard;
+* Platform-wide monitoring and management.
